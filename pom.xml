@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.springframework.cloud</groupId>
         <artifactId>spring-cloud-build</artifactId>
-        <version>1.0.0.BUILD-SNAPSHOT</version>
+        <version>1.0.0.M3</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -25,7 +25,7 @@
     </modules>
 
     <properties>
-        <spring-cloud.version>1.0.0.BUILD-SNAPSHOT</spring-cloud.version>
+        <spring-cloud.version>1.0.0.M3</spring-cloud.version>
         <spring-integration.version>4.1.0.RELEASE</spring-integration.version>
         <spring-cloud-connector.version>1.1.0.RELEASE</spring-cloud-connector.version>
         <turbine.version>2.0.0-DP.2</turbine.version>
