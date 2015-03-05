@@ -23,6 +23,7 @@
 
     <properties>
         <spring-cloud.version>1.0.0.RELEASE</spring-cloud.version>
+        <bintray.package>bus</bintray.package>
         <spring-integration.version>4.1.0.RELEASE</spring-integration.version>
         <spring-cloud-connector.version>1.1.0.RELEASE</spring-cloud-connector.version>
         <spring-integration-dsl.version>1.0.1.RELEASE</spring-integration-dsl.version>
