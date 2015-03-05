@@ -6,6 +6,7 @@ _site
 .idea
 *.sw[op]
 .project
+docs/
 sample-pages
 spring-cloud-*/
 target/
