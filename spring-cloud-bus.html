@@ -4,13 +4,13 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.0">
-<title>Spring Platform Bus</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic|Noto+Serif:400,400italic,700,700italic|Droid+Sans+Mono:400">
+<meta name="generator" content="Asciidoctor 1.5.2">
+<title>Spring Cloud Bus</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400">
 <style>
 /* Asciidoctor default stylesheet | MIT License | http://asciidoctor.org */
 /* Remove the comments around the @import statement below when using this as a custom stylesheet */
-/*@import "https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic|Noto+Serif:400,400italic,700,700italic|Droid+Sans+Mono:400";*/
+/*@import "https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400";*/
 article,aside,details,figcaption,figure,footer,header,hgroup,main,nav,section,summary{display:block}
 audio,canvas,video{display:inline-block}
 audio:not([controls]){display:none;height:0}
@@ -274,8 +274,8 @@ dl dd:last-child,dl dd:last-child>:last-child{margin-bottom:0}
 ol>li p,ul>li p,ul dd,ol dd,.olist .olist,.ulist .ulist,.ulist .olist,.olist .ulist{margin-bottom:.625em}
 ul.unstyled,ol.unnumbered,ul.checklist,ul.none{list-style-type:none}
 ul.unstyled,ol.unnumbered,ul.checklist{margin-left:.625em}
-ul.checklist li>p:first-child>.fa-check-square-o:first-child,ul.checklist li>p:first-child>input[type="checkbox"]:first-child{margin-right:.25em}
-ul.checklist li>p:first-child>input[type="checkbox"]:first-child{position:relative;top:1px}
+ul.checklist li>p:first-child>.fa-square-o:first-child,ul.checklist li>p:first-child>.fa-check-square-o:first-child{width:1em;font-size:.85em}
+ul.checklist li>p:first-child>input[type="checkbox"]:first-child{width:1em;position:relative;top:1px}
 ul.inline{margin:0 auto .625em auto;margin-left:-1.375em;margin-right:0;padding:0;list-style:none;overflow:hidden}
 ul.inline>li{list-style:none;float:left;margin-left:1.375em;display:block}
 ul.inline>li>*{display:block}
@@ -380,7 +380,7 @@ p{margin-bottom:1.25rem}
 *{-webkit-box-shadow:none!important;box-shadow:none!important;text-shadow:none!important}
 a{color:inherit!important;text-decoration:underline!important}
 a.bare,a[href^="#"],a[href^="mailto:"]{text-decoration:none!important}
-a[href^="http:"]:not(.bare):after,a[href^="https:"]:not(.bare):after,a[href^="mailto:"]:not(.bare):after{content:"(" attr(href) ")";display:inline-block;font-size:.875em;padding-left:.25em}
+a[href^="http:"]:not(.bare):after,a[href^="https:"]:not(.bare):after{content:"(" attr(href) ")";display:inline-block;font-size:.875em;padding-left:.25em}
 abbr[title]:after{content:" (" attr(title) ")"}
 pre,blockquote,tr,img{page-break-inside:avoid}
 thead{display:table-header-group}
@@ -411,11 +411,15 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </head>
 <body class="article">
 <div id="header">
-<h1>Spring Platform Bus</h1>
+<h1>Spring Cloud Bus</h1>
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
 <li><a href="#_quick_start">Quick Start</a></li>
+<li><a href="#_addressing_an_instance">Addressing an Instance</a></li>
+<li><a href="#_addressing_all_instances_of_a_service">Addressing all instances of a service</a></li>
+<li><a href="#_application_context_id_must_be_unique">Application Context ID must be unique</a></li>
+<li><a href="#_customizing_the_amqp_connectionfactory">Customizing the AMQP ConnectionFactory</a></li>
 </ul>
 </div>
 </div>
@@ -424,6 +428,9 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="sectionbody">
 <div class="paragraph">
 <p>Spring Cloud Bus links nodes of a distributed system with a lightweight message broker. This can then be used to broadcast state changes (e.g. configuration changes) or other management instructions. A key idea is that the Bus is like a distributed Actuator for a Spring Boot application that is scaled out, but it can also be used as a communication channel between apps. The only implementation currently is with an AMQP broker as the transport, but the same basic feature set (and some more depending on the transport) is on the roadmap for other transports.</p>
+</div>
+<div class="paragraph">
+<p><a href="https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/master/docs/src/main/asciidoc/contributing-docs.adoc" class="bare">https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/master/docs/src/main/asciidoc/contributing-docs.adoc</a></p>
 </div>
 </div>
 </div>
@@ -449,10 +456,53 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="_addressing_an_instance">Addressing an Instance</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The HTTP endpoints accept a "destination" parameter, e.g. "/bus/refresh?destination=customers:9000", where the destination is an <code>ApplicationContext</code> ID. If the ID is owned by an instance on the Bus then it will process the message and all other instances will ignore it. Spring Boot sets the ID for you in the <code>ContextIdApplicationContextInitializer</code> to a combination of the <code>spring.application.name</code>, active profiles and <code>server.port</code> by default.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_addressing_all_instances_of_a_service">Addressing all instances of a service</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The "destination" parameter is used in a Spring <code>PathMatcher</code> (with the path separator as a colon <code>:</code>) to determine if an instance will process the message.   Using the example from above, "/bus/refresh?destination=customers:**" will  target  all instances of the "customers" service regardless of the profiles and ports set as the <code>ApplicationContext</code> ID.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_application_context_id_must_be_unique">Application Context ID must be unique</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The bus tries to eliminate processing an event twice, once from the original <code>ApplicationEvent</code> and once from the queue.  To do this, it checks the sending application context id againts the current application context id.  If multiple instances of a service have the same application context id, events will not be processed.  Running on a local machine, each service will be on a different port and that will be part of the application context id.  Cloud Foundry supplies an index to differentiate.  To ensure that the application context id is the unique, set <code>spring.application.index</code> to something unique for each instance of a service.  For example, in lattice, set <code>spring.application.index=${INSTANCE_INDEX}</code> in application.properties (or bootstrap.properties if using configserver).</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_customizing_the_amqp_connectionfactory">Customizing the AMQP ConnectionFactory</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>If you are using AMQP there needs to be a <code>ConnectionFactory</code> (from
+Spring Rabbit) in the application context. If there is a single
+<code>ConnectionFactory</code> it will be used, or if there is a one qualified as
+<code>@BusConnectionFactory</code> it will be preferred over others, otherwise
+the <code>@Primary</code> one will be used. If there are multiple unqualified
+connection factories there will be an error.</p>
+</div>
+<div class="paragraph">
+<p>Note that Spring Boot (as of 1.2.2) creates a <code>ConnectionFactory</code> that
+is <em>not</em> <code>@Primary</code>, so if you want to use one connection factory for
+the bus and another for business messages, you need to create both,
+and annotate them <code>@BusConnectionFactory</code> and <code>@Primary</code> respectively.</p>
+</div>
+</div>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2014-10-07 12:50:19 UTC
+Last updated 2015-08-25 14:23:36 UTC
 </div>
 </div>
 </body>
