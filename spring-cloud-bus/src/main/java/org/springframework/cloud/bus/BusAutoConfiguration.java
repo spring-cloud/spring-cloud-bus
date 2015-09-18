@@ -76,9 +76,9 @@ public class BusAutoConfiguration implements ApplicationEventPublisherAware {
 		}
 
 		@Bean
-		public ServiceMatcher serviceMatcher(PathMatcher pathMatcher) {
+		public ServiceMatcher serviceMatcher() {
 			ServiceMatcher serviceMatcher = new ServiceMatcher();
-			serviceMatcher.setMatcher(pathMatcher);
+			serviceMatcher.setMatcher(busPathMatcher());
 			return serviceMatcher;
 		}
 
