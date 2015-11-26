@@ -419,7 +419,8 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_addressing_an_instance">Addressing an Instance</a></li>
 <li><a href="#_addressing_all_instances_of_a_service">Addressing all instances of a service</a></li>
 <li><a href="#_application_context_id_must_be_unique">Application Context ID must be unique</a></li>
-<li><a href="#_customizing_the_amqp_connectionfactory">Customizing the AMQP ConnectionFactory</a></li>
+<li><a href="#_customizing_the_message_broker">Customizing the Message Broker</a></li>
+<li><a href="#_tracing_bus_events">Tracing Bus Events</a></li>
 </ul>
 </div>
 </div>
@@ -481,28 +482,105 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 </div>
 <div class="sect1">
-<h2 id="_customizing_the_amqp_connectionfactory">Customizing the AMQP ConnectionFactory</h2>
+<h2 id="_customizing_the_message_broker">Customizing the Message Broker</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>If you are using AMQP there needs to be a <code>ConnectionFactory</code> (from
-Spring Rabbit) in the application context. If there is a single
-<code>ConnectionFactory</code> it will be used, or if there is a one qualified as
-<code>@BusConnectionFactory</code> it will be preferred over others, otherwise
-the <code>@Primary</code> one will be used. If there are multiple unqualified
-connection factories there will be an error.</p>
+<p>Spring Cloud Bus uses
+<a href="https://cloud.spring.io/spring-cloud-stream">Spring Cloud Stream</a> to
+broadcast the messages so to get messages to flow you only need to
+include the binder implementation of your choice in the
+classpath. There are convenient starters specifically for the bus with
+AMQP, Kafka and Redis
+(<code>spring-cloud-starter-bus-[amqp,kafka,redis]</code>). Generally speaking
+Spring Cloud Stream relies on Spring Boot autoconfiguration
+conventions for configuring middleware, so for instance the AMQP
+broker address can be changed with <code>spring.rabbitmq.*</code>
+configuration properties. Spring Cloud Bus has a handful of native
+configuration properties in <code>spring.cloud.bus.*</code>
+(e.g. <code>spring.cloud.bus.destination</code> is the name of the topic to use
+the the externall middleware). Normally the defaults will suffice.</p>
 </div>
 <div class="paragraph">
-<p>Note that Spring Boot (as of 1.2.2) creates a <code>ConnectionFactory</code> that
-is <em>not</em> <code>@Primary</code>, so if you want to use one connection factory for
-the bus and another for business messages, you need to create both,
-and annotate them <code>@BusConnectionFactory</code> and <code>@Primary</code> respectively.</p>
+<p>To lean more about how to customize the message broker settings
+consult the Spring Cloud Stream documentation.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_tracing_bus_events">Tracing Bus Events</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Bus events (subclasses of <code>RemoteApplicationEvent</code>) can be traced by
+setting <code>spring.cloud.bus.trace.enabled=true</code>. If you do this then the
+Spring Boot <code>TraceRepository</code> (if it is present) will show each event
+sent and all the acks from each service instance. Example (from the
+<code>/trace</code> endpoint):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-json" data-lang="json">{
+  "timestamp": "2015-11-26T10:24:44.411+0000",
+  "info": {
+    "signal": "spring.cloud.bus.ack",
+    "type": "RefreshRemoteApplicationEvent",
+    "id": "c4d374b7-58ea-4928-a312-31984def293b",
+    "origin": "stores:8081",
+    "destination": "*:**"
+  }
+  },
+  {
+  "timestamp": "2015-11-26T10:24:41.864+0000",
+  "info": {
+    "signal": "spring.cloud.bus.sent",
+    "type": "RefreshRemoteApplicationEvent",
+    "id": "c4d374b7-58ea-4928-a312-31984def293b",
+    "origin": "customers:9000",
+    "destination": "*:**"
+  }
+  },
+  {
+  "timestamp": "2015-11-26T10:24:41.862+0000",
+  "info": {
+    "signal": "spring.cloud.bus.ack",
+    "type": "RefreshRemoteApplicationEvent",
+    "id": "c4d374b7-58ea-4928-a312-31984def293b",
+    "origin": "customers:9000",
+    "destination": "*:**"
+  }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This trace shows that a <code>RefreshRemoteApplicationEvent</code> was sent from
+<code>customers:9000</code>, broadcast to all services, and it was received
+(acked) by <code>customers:9000</code> and <code>stores:8081</code>.</p>
+</div>
+<div class="paragraph">
+<p>To handle the ack signals yourself you could add an <code>@EventListener</code>
+for the <code>AckRemoteAppplicationEvent</code> and <code>SentApplicationEvent</code> types
+to your app (and enable tracing). Or you could tap into the
+<code>TraceRepository</code> and mine the data from there.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+Any Bus application can trace acks, but sometimes it will be
+useful to do this in a central service that can do more complex
+queries on the data. Or forward it to a specialized tracing service.
+</td>
+</tr>
+</table>
 </div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-11-25 16:19:07 UTC
+Last updated 2015-11-26 12:05:48 UTC
 </div>
 </div>
 </body>
