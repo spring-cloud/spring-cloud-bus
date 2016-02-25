@@ -1,5 +1,5 @@
 = Spring Cloud Bus
-:github: https://github.com/spring-cloud/spring-cloud-config
+:github: https://github.com/spring-cloud/spring-cloud-bus
 :githubmaster: {github}/tree/master
 :docslink: {githubmaster}/docs/src/main/asciidoc
 :toc:

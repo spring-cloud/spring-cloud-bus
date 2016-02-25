@@ -6,7 +6,6 @@
     <artifactId>spring-cloud-bus-parent</artifactId>
     <version>1.0.4.BUILD-SNAPSHOT</version>
     <packaging>pom</packaging>
-
     <name>spring-cloud-bus-parent</name>
     <description>Spring Cloud Bus Parent</description>
 
