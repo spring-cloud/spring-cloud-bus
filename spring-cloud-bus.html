@@ -601,15 +601,19 @@ queries on the data. Or forward it to a specialized tracing service.
 <div class="paragraph">
 <p>The Bus can carry any event of type <code>RemoteApplicationEvent</code>, but the
 default transport is JSON and the deserializer needs to know which
-types are going to be used ahead of time. To register a new type you
-can use <code>@JsonTypeName</code> on your custom class.</p>
+types are going to be used ahead of time. To register a new type it
+needs to be in a subpackage of <code>org.springframework.cloud.bus.event</code>.
+You can use <code>@JsonTypeName</code> on your custom class or rely on the
+default strategy which is to use the simple name of the class. Note
+that both the producer and the consumer will need access to the class
+definition.</p>
 </div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-04-18 09:24:52 UTC
+Last updated 2016-04-25 10:57:11 UTC
 </div>
 </div>
 </body>
