@@ -429,7 +429,11 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_application_context_id_must_be_unique">Application Context ID must be unique</a></li>
 <li><a href="#_customizing_the_message_broker">Customizing the Message Broker</a></li>
 <li><a href="#_tracing_bus_events">Tracing Bus Events</a></li>
-<li><a href="#_broadcasting_your_own_events">Broadcasting Your Own Events</a></li>
+<li><a href="#_broadcasting_your_own_events">Broadcasting Your Own Events</a>
+<ul class="sectlevel2">
+<li><a href="#_registering_events_in_custom_packages">Registering events in custom packages</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -614,18 +618,83 @@ queries on the data. Or forward it to a specialized tracing service.
 <p>The Bus can carry any event of type <code>RemoteApplicationEvent</code>, but the
 default transport is JSON and the deserializer needs to know which
 types are going to be used ahead of time. To register a new type it
-needs to be in a subpackage of <code>org.springframework.cloud.bus.event</code>.
-You can use <code>@JsonTypeName</code> on your custom class or rely on the
-default strategy which is to use the simple name of the class. Note
-that both the producer and the consumer will need access to the class
+needs to be in a subpackage of <code>org.springframework.cloud.bus.event</code>.</p>
+</div>
+<div class="paragraph">
+<p>To customise the event name you can use <code>@JsonTypeName</code> on your custom class
+or rely on the default strategy which is to use the simple name of the class.
+Note that both the producer and the consumer will need access to the class
 definition.</p>
+</div>
+<div class="sect2">
+<h3 id="_registering_events_in_custom_packages">Registering events in custom packages</h3>
+<div class="paragraph">
+<p>If you cannot or don&#8217;t want to use a subpackage of <code>org.springframework.cloud.bus.event</code>
+for your custom events, you must specify which packages to scan for events of
+type <code>RemoteApplicationEvent</code> using <code>@RemoteApplicationEventScan</code>. Packages
+specified with <code>@RemoteApplicationEventScan</code> include subpackages.</p>
+</div>
+<div class="paragraph">
+<p>For example, if you have a custom event called <code>FooEvent</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">package com.acme;
+
+public class FooEvent extends RemoteApplicationEvent {
+    ...
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>you can register this event with the deserializer in the following way:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">package com.acme;
+
+@Configuration
+@RemoteApplicationEventScan
+public class BusConfiguration {
+    ...
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Without specifying a value, the package of the class where <code>@RemoteApplicationEventScan</code>
+is used will be registered. In this example <code>com.acme</code> will be registered using the
+package of <code>BusConfiguration</code>.</p>
+</div>
+<div class="paragraph">
+<p>You can also explicitly specify the packages to scan using the <code>value</code>, <code>basePackages</code> or
+<code>basePackageClasses</code> properties on <code>@RemoteApplicationEventScan</code>. For example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">package com.acme;
+
+@Configuration
+//@RemoteApplicationEventScan({"com.acme", "foo.bar"})
+//@RemoteApplicationEventScan(basePackages = {"com.acme", "foo.bar", "fizz.buzz"})
+@RemoteApplicationEventScan(basePackageClasses = BusConfiguration.class)
+public class BusConfiguration {
+    ...
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>All examples of <code>@RemoteApplicationEventScan</code> above are equivalent,
+in that the <code>com.acme</code> package will be registered by explicitly specifying the
+packages on <code>@RemoteApplicationEventScan</code>. Note, you can specify multiple base
+packages to scan.</p>
+</div>
 </div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-08-30 13:45:06 UTC
+Last updated 2016-08-30 16:29:19 UTC
 </div>
 </div>
 </body>
