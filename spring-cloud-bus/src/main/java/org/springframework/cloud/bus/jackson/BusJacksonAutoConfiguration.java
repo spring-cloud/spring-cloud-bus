@@ -32,6 +32,7 @@ import com.fasterxml.jackson.databind.exc.InvalidTypeIdException;
  * @author Spencer Gibb
  * @author Dave Syer
  * @author Donovan Muller
+ * @author Stefan Pfeiffer
  */
 @Configuration
 @ConditionalOnBusEnabled
@@ -107,7 +108,7 @@ class BusJacksonMessageConverter extends AbstractMessageConverter
 			Object payload = message.getPayload();
 
 			if (payload instanceof byte[]) {
-			  try {
+				try {
 					result = this.mapper.readValue((byte[]) payload, targetClass);
 				} catch (InvalidTypeIdException e) {
 					return new UnknownRemoteApplicationEvent(new Object(), e.getTypeId(), (byte[]) payload);

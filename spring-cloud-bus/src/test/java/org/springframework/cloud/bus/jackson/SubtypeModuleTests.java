@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Spencer Gibb
+ * @author Stefan Pfeiffer
  */
 public class SubtypeModuleTests {
 
