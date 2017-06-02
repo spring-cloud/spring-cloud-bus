@@ -423,6 +423,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
+<li><a href="#_quick_start">Quick Start</a></li>
 <li><a href="#_addressing_an_instance">Addressing an Instance</a></li>
 <li><a href="#_addressing_all_instances_of_a_service">Addressing all instances of a service</a></li>
 <li><a href="#_application_context_id_must_be_unique">Application Context ID must be unique</a></li>
@@ -442,10 +443,23 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="paragraph">
 <p>Spring Cloud Bus links nodes of a distributed system with a lightweight message broker. This can then be used to broadcast state changes (e.g. configuration changes) or other management instructions. A key idea is that the Bus is like a distributed Actuator for a Spring Boot application that is scaled out, but it can also be used as a communication channel between apps. Starters are provided for an AMQP broker as the transport or for Kafka, but the same basic feature set (and some more depending on the transport) is on the roadmap for other transports.</p>
 </div>
-<div class="paragraph">
-<p>Unresolved directive in spring-cloud-bus.adoc - include::https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/master/docs/src/main/asciidoc/contributing-docs.adoc[]
-== Quick Start</p>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+Spring Cloud is released under the non-restrictive Apache 2.0 license. If you would like to contribute to this section of the documentation or if you find an error, please find the source code and issue trackers in the project at <a href="https://github.com/spring-cloud/spring-cloud-config/tree/master/docs/src/main/asciidoc">github</a>.
+</td>
+</tr>
+</table>
 </div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_quick_start">Quick Start</h2>
+<div class="sectionbody">
 <div class="paragraph">
 <p>Spring Cloud Bus works by adding Spring Boot autconfiguration if it detects itself on the classpath. All you need to do to enable the bus is to add <code>spring-cloud-starter-bus-amqp</code> or <code>spring-cloud-starter-bus-kafka</code> to your dependency management and Spring Cloud takes care of the rest. Make sure the broker (RabbitMQ or Kafka) is available and configured: running on localhost you shouldn&#8217;t have to do anything, but if you are running remotely use Spring Cloud Connectors, or Spring Boot conventions to define the broker credentials, e.g. for Rabbit</p>
 </div>
