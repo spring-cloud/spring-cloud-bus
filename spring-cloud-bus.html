@@ -552,7 +552,7 @@ sent and all the acks from each service instance. Example (from the
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-json" data-lang="json">{
+<pre class="prettyprint highlight"><code class="language-json" data-lang="json">{
   "timestamp": "2015-11-26T10:24:44.411+0000",
   "info": {
     "signal": "spring.cloud.bus.ack",
@@ -639,7 +639,7 @@ specified with <code>@RemoteApplicationEventScan</code> include subpackages.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-java" data-lang="java">package com.acme;
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">package com.acme;
 
 public class FooEvent extends RemoteApplicationEvent {
     ...
@@ -651,7 +651,7 @@ public class FooEvent extends RemoteApplicationEvent {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-java" data-lang="java">package com.acme;
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">package com.acme;
 
 @Configuration
 @RemoteApplicationEventScan
@@ -671,7 +671,7 @@ package of <code>BusConfiguration</code>.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-java" data-lang="java">package com.acme;
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">package com.acme;
 
 @Configuration
 //@RemoteApplicationEventScan({"com.acme", "foo.bar"})
@@ -692,5 +692,8 @@ packages to scan.</p>
 </div>
 </div>
 </div>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.js"></script>
+<script>prettyPrint()</script>
 </body>
 </html>
