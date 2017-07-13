@@ -30,12 +30,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.cloud.bus.endpoint.BusEndpoint;
 import org.springframework.cloud.bus.endpoint.EnvironmentBusEndpoint;
 import org.springframework.cloud.bus.endpoint.RefreshBusEndpoint;
-import org.springframework.cloud.bus.event.AckRemoteApplicationEvent;
-import org.springframework.cloud.bus.event.EnvironmentChangeListener;
-import org.springframework.cloud.bus.event.RefreshListener;
-import org.springframework.cloud.bus.event.RemoteApplicationEvent;
-import org.springframework.cloud.bus.event.SentApplicationEvent;
-import org.springframework.cloud.bus.event.TraceListener;
+import org.springframework.cloud.bus.event.*;
 import org.springframework.cloud.context.environment.EnvironmentManager;
 import org.springframework.cloud.context.refresh.ContextRefresher;
 import org.springframework.cloud.context.scope.refresh.RefreshScope;
@@ -124,6 +119,10 @@ public class BusAutoConfiguration implements ApplicationEventPublisherAware {
 
 	@StreamListener(SpringCloudBusClient.INPUT)
 	public void acceptRemote(RemoteApplicationEvent event) {
+		if (event instanceof UnknownRemoteApplicationEvent) {
+			// We can't process this event.
+			return;
+		}
 		if (event instanceof AckRemoteApplicationEvent) {
 			if (this.bus.getTrace().isEnabled() && !this.serviceMatcher.isFromSelf(event)
 					&& this.applicationEventPublisher != null) {
