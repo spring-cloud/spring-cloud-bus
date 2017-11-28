@@ -1,0 +1,36 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>7.&nbsp;Broadcasting Your Own Events</title><link rel="stylesheet" type="text/css" href="css/manual-multipage.css"><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"><link rel="home" href="multi_spring-cloud-bus.html" title="Spring Cloud Bus"><link rel="up" href="multi_spring-cloud-bus.html" title="Spring Cloud Bus"><link rel="prev" href="multi__tracing_bus_events.html" title="6.&nbsp;Tracing Bus Events"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">7.&nbsp;Broadcasting Your Own Events</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="multi__tracing_bus_events.html">Prev</a>&nbsp;</td><th width="60%" align="center">&nbsp;</th><td width="20%" align="right">&nbsp;</td></tr></table><hr></div><div class="chapter"><div class="titlepage"><div><div><h1 class="title"><a name="_broadcasting_your_own_events" href="#_broadcasting_your_own_events"></a>7.&nbsp;Broadcasting Your Own Events</h1></div></div></div><p>The Bus can carry any event of type <code class="literal">RemoteApplicationEvent</code>, but the
+default transport is JSON and the deserializer needs to know which
+types are going to be used ahead of time. To register a new type it
+needs to be in a subpackage of <code class="literal">org.springframework.cloud.bus.event</code>.</p><p>To customise the event name you can use <code class="literal">@JsonTypeName</code> on your custom class
+or rely on the default strategy which is to use the simple name of the class.
+Note that both the producer and the consumer will need access to the class
+definition.</p><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="_registering_events_in_custom_packages" href="#_registering_events_in_custom_packages"></a>7.1&nbsp;Registering events in custom packages</h2></div></div></div><p>If you cannot or don&#8217;t want to use a subpackage of <code class="literal">org.springframework.cloud.bus.event</code>
+for your custom events, you must specify which packages to scan for events of
+type <code class="literal">RemoteApplicationEvent</code> using <code class="literal">@RemoteApplicationEventScan</code>. Packages
+specified with <code class="literal">@RemoteApplicationEventScan</code> include subpackages.</p><p>For example, if you have a custom event called <code class="literal">FooEvent</code>:</p><pre class="programlisting"><span xmlns:d="http://docbook.org/ns/docbook" class="hl-keyword">package</span> com.acme;
+
+<span xmlns:d="http://docbook.org/ns/docbook" class="hl-keyword">public</span> <span xmlns:d="http://docbook.org/ns/docbook" class="hl-keyword">class</span> FooEvent <span xmlns:d="http://docbook.org/ns/docbook" class="hl-keyword">extends</span> RemoteApplicationEvent {
+    ...
+}</pre><p>you can register this event with the deserializer in the following way:</p><pre class="programlisting"><span xmlns:d="http://docbook.org/ns/docbook" class="hl-keyword">package</span> com.acme;
+
+<em><span class="hl-annotation" style="color: gray">@Configuration</span></em>
+<em><span class="hl-annotation" style="color: gray">@RemoteApplicationEventScan</span></em>
+<span xmlns:d="http://docbook.org/ns/docbook" class="hl-keyword">public</span> <span xmlns:d="http://docbook.org/ns/docbook" class="hl-keyword">class</span> BusConfiguration {
+    ...
+}</pre><p>Without specifying a value, the package of the class where <code class="literal">@RemoteApplicationEventScan</code>
+is used will be registered. In this example <code class="literal">com.acme</code> will be registered using the
+package of <code class="literal">BusConfiguration</code>.</p><p>You can also explicitly specify the packages to scan using the <code class="literal">value</code>, <code class="literal">basePackages</code> or
+<code class="literal">basePackageClasses</code> properties on <code class="literal">@RemoteApplicationEventScan</code>. For example:</p><pre class="programlisting"><span xmlns:d="http://docbook.org/ns/docbook" class="hl-keyword">package</span> com.acme;
+
+<em><span class="hl-annotation" style="color: gray">@Configuration</span></em>
+<span xmlns:d="http://docbook.org/ns/docbook" class="hl-comment">//@RemoteApplicationEventScan({"com.acme", "foo.bar"})</span>
+<span xmlns:d="http://docbook.org/ns/docbook" class="hl-comment">//@RemoteApplicationEventScan(basePackages = {"com.acme", "foo.bar", "fizz.buzz"})</span>
+<em><span class="hl-annotation" style="color: gray">@RemoteApplicationEventScan(basePackageClasses = BusConfiguration.class)</span></em>
+<span xmlns:d="http://docbook.org/ns/docbook" class="hl-keyword">public</span> <span xmlns:d="http://docbook.org/ns/docbook" class="hl-keyword">class</span> BusConfiguration {
+    ...
+}</pre><p>All examples of <code class="literal">@RemoteApplicationEventScan</code> above are equivalent,
+in that the <code class="literal">com.acme</code> package will be registered by explicitly specifying the
+packages on <code class="literal">@RemoteApplicationEventScan</code>. Note, you can specify multiple base
+packages to scan.</p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="multi__tracing_bus_events.html">Prev</a>&nbsp;</td><td width="20%" align="center">&nbsp;</td><td width="40%" align="right">&nbsp;</td></tr><tr><td width="40%" align="left" valign="top">6.&nbsp;Tracing Bus Events&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="multi_spring-cloud-bus.html">Home</a></td><td width="40%" align="right" valign="top">&nbsp;</td></tr></table></div></body></html>
