@@ -34,15 +34,27 @@
 </chapter>
 <chapter xml:id="_addressing_an_instance">
 <title>Addressing an Instance</title>
-<simpara>The HTTP endpoints accept a "destination" parameter, e.g. "/bus/refresh?destination=customers:9000", where the destination is an <literal>ApplicationContext</literal> ID. If the ID is owned by an instance on the Bus then it will process the message and all other instances will ignore it. Spring Boot sets the ID for you in the <literal>ContextIdApplicationContextInitializer</literal> to a combination of the <literal>spring.application.name</literal>, active profiles and <literal>server.port</literal> by default.</simpara>
+<simpara>Each instance of the application has a service ID, whose value can be set using <literal>spring.cloud.bus.id</literal>, and whose value is expected to be a colon-separated list of identifiers, in order of least specific to most specific. The default value is constructed from the environment as a combination of the <literal>spring.application.name</literal> and <literal>server.port</literal> (or <literal>spring.application.index</literal> if set). The default value of the ID is constructed in the form <literal>app:index:id</literal> where:</simpara>
+<itemizedlist>
+<listitem>
+<simpara><literal>app</literal> is the <literal>vcap.application.name</literal> if it exists, or <literal>spring.application.name</literal></simpara>
+</listitem>
+<listitem>
+<simpara><literal>index</literal> is the <literal>vcap.application.instance_index</literal> if it exists, or else <literal>spring.application.index</literal>, or else <literal>local.server.port</literal> (or <literal>server.port</literal> or <literal>0</literal>).</simpara>
+</listitem>
+<listitem>
+<simpara><literal>id</literal> is the <literal>vcap.application.instance_id</literal> if it exists, or else a random value.</simpara>
+</listitem>
+</itemizedlist>
+<simpara>The HTTP endpoints accept a "destination" parameter, e.g. "/bus/refresh?destination=customers:9000", where the destination is a service ID. If the ID is owned by an instance on the Bus then it will process the message and all other instances will ignore it.</simpara>
 </chapter>
 <chapter xml:id="_addressing_all_instances_of_a_service">
 <title>Addressing all instances of a service</title>
-<simpara>The "destination" parameter is used in a Spring <literal>PathMatcher</literal> (with the path separator as a colon <literal>:</literal>) to determine if an instance will process the message.   Using the example from above, "/bus/refresh?destination=customers:**" will  target  all instances of the "customers" service regardless of the profiles and ports set as the <literal>ApplicationContext</literal> ID.</simpara>
+<simpara>The "destination" parameter is used in a Spring <literal>PathMatcher</literal> (with the path separator as a colon <literal>:</literal>) to determine if an instance will process the message.   Using the example from above, "/bus/refresh?destination=customers:**" will  target  all instances of the "customers" service regardless of the rest of the service ID.</simpara>
 </chapter>
-<chapter xml:id="_application_context_id_must_be_unique">
-<title>Application Context ID must be unique</title>
-<simpara>The bus tries to eliminate processing an event twice, once from the original <literal>ApplicationEvent</literal> and once from the queue.  To do this, it checks the sending application context id againts the current application context id.  If multiple instances of a service have the same application context id, events will not be processed.  Running on a local machine, each service will be on a different port and that will be part of the application context id.  Cloud Foundry supplies an index to differentiate.  To ensure that the application context id is the unique, set <literal>spring.application.index</literal> to something unique for each instance of a service.  For example, in lattice, set <literal>spring.application.index=${INSTANCE_INDEX}</literal> in application.properties (or bootstrap.properties if using configserver).</simpara>
+<chapter xml:id="_service_id_must_be_unique">
+<title>Service ID must be unique</title>
+<simpara>The bus tries to eliminate processing an event twice, once from the original <literal>ApplicationEvent</literal> and once from the queue.  To do this, it checks the sending service ID againts the current service ID.  If multiple instances of a service have the same ID, events will not be processed.  Running on a local machine, each service will be on a different port and that will be part of the ID.  Cloud Foundry supplies an index to differentiate.  To ensure that the ID is unique outside Cloud Foundry, set <literal>spring.application.index</literal> to something unique for each instance of a service.</simpara>
 </chapter>
 <chapter xml:id="_customizing_the_message_broker">
 <title>Customizing the Message Broker</title>
