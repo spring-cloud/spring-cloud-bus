@@ -50,6 +50,34 @@ common implementations. However, Spring Cloud Stream is quite flexible, and the 
 works with <literal>spring-cloud-bus</literal>.</simpara>
 </note>
 </chapter>
+<chapter xml:id="_bus_endpoints">
+<title>Bus Endpoints</title>
+<simpara>Spring Cloud Bus provides two endpoints, <literal>/actuator/bus-refresh</literal> and <literal>/actuator/bus-env</literal>
+that correspond to individual actuator endpoints in Spring Cloud Commons,
+<literal>/actuator/refresh</literal> and <literal>/actuator/env</literal> respectively.</simpara>
+<section xml:id="_bus_refresh_endpoint">
+<title>Bus Refresh Endpoint</title>
+<simpara>The <literal>/actuator/bus-refresh</literal> endpoint clears the <literal>RefreshScope</literal> cache and rebinds
+<literal>@ConfigurationProperties</literal>. See the <link linkend="refresh-scope">Refresh Scope</link> documentation for
+more information.</simpara>
+<simpara>To expose the <literal>/actuator/bus-refresh</literal> endpoint, you need to add following configuration to your
+application:</simpara>
+<programlisting language="properties" linenumbering="unnumbered">management.endpoints.web.exposure.include=bus-refresh</programlisting>
+</section>
+<section xml:id="_bus_env_endpoint">
+<title>Bus Env Endpoint</title>
+<simpara>The <literal>/actuator/bus-env</literal> endpoint updates each instances environment with the specified
+key/value pair across multiple instances.</simpara>
+<simpara>To expose the <literal>/actuator/bus-env</literal> endpoint, you need to add following configuration to your
+application:</simpara>
+<programlisting language="properties" linenumbering="unnumbered">management.endpoints.web.exposure.include=bus-env</programlisting>
+<simpara>The <literal>/actuator/bus-env</literal> endpoint accepts <literal>POST</literal> requests with the following shape:</simpara>
+<programlisting language="json" linenumbering="unnumbered">{
+	"name": "key1",
+	"value": "value1"
+}</programlisting>
+</section>
+</chapter>
 <chapter xml:id="_addressing_an_instance">
 <title>Addressing an Instance</title>
 <simpara>Each instance of the application has a service ID, whose value can be set with
@@ -70,8 +98,8 @@ constructed in the form of <literal>app:index:id</literal>, where:</simpara>
 <simpara><literal>id</literal> is the <literal>vcap.application.instance_id</literal>, if it exists, or a random value.</simpara>
 </listitem>
 </itemizedlist>
-<simpara>The HTTP endpoints accept a &#8220;destination&#8221; parameter, such as
-<literal>/bus/refresh?destination=customers:9000</literal>, where <literal>destination</literal> is a service ID. If the ID
+<simpara>The HTTP endpoints accept a &#8220;destination&#8221; path parameter, such as
+<literal>/bus-refresh/customers:9000</literal>, where <literal>destination</literal> is a service ID. If the ID
 is owned by an instance on the bus, it processes the message, and all other instances
 ignore it.</simpara>
 </chapter>
@@ -79,7 +107,7 @@ ignore it.</simpara>
 <title>Addressing All Instances of a Service</title>
 <simpara>The &#8220;destination&#8221; parameter is used in a Spring <literal>PathMatcher</literal> (with the path separator
 as a colon&#8201;&#8212;&#8201;<literal>:</literal>) to determine if an instance processes the message. Using the example
-from earlier, <literal>/bus/refresh?destination=customers:**</literal> targets all instances of the
+from earlier, <literal>/bus-env/customers:**</literal> targets all instances of the
 &#8220;customers&#8221; service regardless of the rest of the service ID.</simpara>
 </chapter>
 <chapter xml:id="_service_id_must_be_unique">
