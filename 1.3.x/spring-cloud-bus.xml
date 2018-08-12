@@ -9,9 +9,7 @@
 <preface>
 <title></title>
 <simpara>Spring Cloud Bus links nodes of a distributed system with a lightweight message broker. This can then be used to broadcast state changes (e.g. configuration changes) or other management instructions. A key idea is that the Bus is like a distributed Actuator for a Spring Boot application that is scaled out, but it can also be used as a communication channel between apps. Starters are provided for an AMQP broker as the transport or for Kafka, but the same basic feature set (and some more depending on the transport) is on the roadmap for other transports.</simpara>
-<note>
-<simpara>Spring Cloud is released under the non-restrictive Apache 2.0 license. If you would like to contribute to this section of the documentation or if you find an error, please find the source code and issue trackers in the project at <link xl:href="https://github.com/spring-cloud/spring-cloud-config/tree/master/docs/src/main/asciidoc">github</link>.</simpara>
-</note>
+<simpara>Unresolved directive in spring-cloud-bus.adoc - include::https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/master/docs/src/main/asciidoc/contributing-docs.adoc[]</simpara>
 </preface>
 <chapter xml:id="_quick_start">
 <title>Quick Start</title>
