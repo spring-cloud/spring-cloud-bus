@@ -1,77 +1,11 @@
----
-# The name of your project
-title: Spring CLoud Config
-
-badges:
-
-  # Customize your project's badges. Delete any entries that do not apply.
-  custom:
-    - name: Source (GitHub)
-      url:  https://github.com/spring-cloud/spring-cloud-bus
-      icon: github
-
-    - name: StackOverflow
-      url:  http://stackoverflow.com/questions/tagged/spring-cloud
-      icon: stackoverflow
-
----
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html lang="en-US">
-
-<!-- Specify the parent of this project (or delete if none) to influence the rendering of the breadcrumb -->
-{% capture parent_link %}
-[Spring Cloud]({{ site.projects_site_url }}/spring-cloud)
-{% endcapture %}
-
-
-{% capture billboard_description %}
-
-Spring Cloud Bus links nodes of a distributed system with a lightweight message broker. This can then be used to broadcast state changes (e.g. configuration changes) or other management instructions. The only implementation currently is with an AMQP broker as the transport, but the same basic feature set (and some more depending on the transport) is on the roadmap for other transports.
-
-{% endcapture %}
-
-{% capture main_content %}
-
-<span id="quick-start"></span>
-
-## Quick Start
-
-<script type="text/javascript">{% include custom.js %}</script>
-{% include download_widget.md %}
-
-As long as Spring Cloud Bus AMQP and RabbitMQ are on the
-classpath any Spring Boot application will try to contact a RabbitMQ
-server on `localhost:5672` (the default value of
-`spring.rabbitmq.addresses`):
-
-```java
-@Configuration
-@EnableAutoConfiguration
-@RestController
-public class Application {
-
-  @RequestMapping("/")
-  public String home() {
-    return "Hello World";
-  }
-
-  public static void main(String[] args) {
-    SpringApplication.run(Application.class, args);
-  }
-
-}
-```
-
-{% endcapture %}
-
-{% capture related_resources %}
-
-### Sample Projects
-
-* [Bus Clients](https://github.com/spring-cloud-samples/customers-stores)
-
-{% endcapture %}
-
-
-{% include project_page.html %}
+  <meta charset="utf-8">
+  <title>Redirecting&hellip;</title>
+  <link rel="canonical" href="http://spring.io/projects/spring-cloud-bus">
+  <meta http-equiv="refresh" content="0; url=http://spring.io/projects/spring-cloud-bus">
+  <meta name="robots" content="noindex">
+  <h1>Redirecting&hellip;</h1>
+  <a href="http://spring.io/projects/spring-cloud-bus">Click here if you are not redirected.</a>
+  <script>location="http://spring.io/projects/spring-cloud-bus"</script>
 </html>
