@@ -20,6 +20,7 @@ package org.springframework.cloud.bus;
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnEnabledEndpoint;
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.actuate.trace.http.HttpTraceRepository;
@@ -182,8 +183,8 @@ public class BusAutoConfiguration implements ApplicationEventPublisherAware {
 
 		@Bean
 		public ServiceMatcher serviceMatcher(@BusPathMatcher PathMatcher pathMatcher,
-				BusProperties properties) {
-			ServiceMatcher serviceMatcher = new ServiceMatcher(pathMatcher, properties.getId());
+				BusProperties properties, @Value("${spring.cloud.config.name:}") String[] configNames) {
+			ServiceMatcher serviceMatcher = new ServiceMatcher(pathMatcher, properties.getId(), configNames);
 			return serviceMatcher;
 		}
 
