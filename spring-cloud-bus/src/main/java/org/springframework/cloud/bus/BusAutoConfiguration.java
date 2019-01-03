@@ -69,11 +69,8 @@ import org.springframework.util.PathMatcher;
 @ConditionalOnBusEnabled
 @EnableBinding(SpringCloudBusClient.class)
 @EnableConfigurationProperties(BusProperties.class)
-@AutoConfigureBefore(BindingServiceConfiguration.class) // so stream bindings work
-														// properly
-@AutoConfigureAfter(LifecycleMvcEndpointAutoConfiguration.class) // so actuator endpoints
-																	// have needed
-																	// dependencies
+@AutoConfigureBefore(BindingServiceConfiguration.class) // so stream bindings work properly
+@AutoConfigureAfter(LifecycleMvcEndpointAutoConfiguration.class) // so actuator endpoints have needed dependencies
 public class BusAutoConfiguration implements ApplicationEventPublisherAware {
 
 	public static final String BUS_PATH_MATCHER_NAME = "busPathMatcher";
@@ -90,8 +87,7 @@ public class BusAutoConfiguration implements ApplicationEventPublisherAware {
 
 	private final BusProperties bus;
 
-	public BusAutoConfiguration(ServiceMatcher serviceMatcher,
-			BindingServiceProperties bindings, BusProperties bus) {
+	public BusAutoConfiguration(ServiceMatcher serviceMatcher, BindingServiceProperties bindings, BusProperties bus) {
 		this.serviceMatcher = serviceMatcher;
 		this.bindings = bindings;
 		this.bus = bus;
@@ -107,8 +103,7 @@ public class BusAutoConfiguration implements ApplicationEventPublisherAware {
 		}
 		BindingProperties input = this.bindings.getBindings()
 				.get(SpringCloudBusClient.INPUT);
-		if (input.getDestination() == null
-				|| input.getDestination().equals(SpringCloudBusClient.INPUT)) {
+		if (input.getDestination() == null || input.getDestination().equals(SpringCloudBusClient.INPUT)) {
 			input.setDestination(this.bus.getDestination());
 		}
 		BindingProperties outputBinding = this.bindings.getBindings()
@@ -119,8 +114,7 @@ public class BusAutoConfiguration implements ApplicationEventPublisherAware {
 		}
 		BindingProperties output = this.bindings.getBindings()
 				.get(SpringCloudBusClient.OUTPUT);
-		if (output.getDestination() == null
-				|| output.getDestination().equals(SpringCloudBusClient.OUTPUT)) {
+		if (output.getDestination() == null || output.getDestination().equals(SpringCloudBusClient.OUTPUT)) {
 			output.setDestination(this.bus.getDestination());
 		}
 	}
