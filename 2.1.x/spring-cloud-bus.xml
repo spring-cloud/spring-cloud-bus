@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<book xmlns="http://docbook.org/ns/docbook" xmlns:xl="http://www.w3.org/1999/xlink" version="5.0" xml:lang="en">
+<info>
+<title>Spring Cloud Bus</title>
+<date>2019-03-08</date>
+</info>
+<preface>
+<title></title>
+<simpara>Spring Cloud Bus links the nodes of a distributed system with a lightweight message
+broker. This broker can then be used to broadcast state changes (such as configuration
+changes) or other management instructions. A key idea is that the bus is like a
+distributed actuator for a Spring Boot application that is scaled out. However, it can
+also be used as a communication channel between apps. This project provides starters for
+either an AMQP broker or Kafka as the transport.</simpara>
+<note>
+<simpara>Spring Cloud is released under the non-restrictive Apache 2.0 license. If you would like to contribute to this section of the documentation or if you find an error, please find the source code and issue trackers in the project at <link xl:href="https://github.com/spring-cloud/spring-cloud-config/tree/master/docs/src/main/asciidoc">github</link>.</simpara>
+</note>
+</preface>
+<chapter xml:id="_quick_start">
+<title>Quick Start</title>
+<simpara>Spring Cloud Bus works by adding Spring Boot autconfiguration if it detects itself on the
+classpath. To enable the bus, add <literal>spring-cloud-starter-bus-amqp</literal> or
+<literal>spring-cloud-starter-bus-kafka</literal> to your dependency management. Spring Cloud takes care of
+the rest. Make sure the broker (RabbitMQ or Kafka) is available and configured. When
+running on localhost, you need not do anything. If you run remotely, use Spring Cloud
+Connectors or Spring Boot conventions to define the broker credentials, as shown in the
+following example for Rabbit:</simpara>
+<formalpara>
+<title>application.yml</title>
+<para>
+<screen>spring:
+  rabbitmq:
+    host: mybroker.com
+    port: 5672
+    username: user
+    password: secret</screen>
+</para>
+</formalpara>
+<simpara>The bus currently supports sending messages to all nodes listening or all nodes for a
+particular service (as defined by Eureka). The <literal>/bus/*</literal> actuator namespace has some HTTP
+endpoints. Currently, two are implemented. The first, <literal>/bus/env</literal>, sends key/value pairs to
+update each node&#8217;s Spring Environment. The second, <literal>/bus/refresh</literal>, reloads each
+application&#8217;s configuration, as though they had all been pinged on their <literal>/refresh</literal>
+endpoint.</simpara>
+<note>
+<simpara>The Spring Cloud Bus starters cover Rabbit and Kafka, because those are the two most
+common implementations. However, Spring Cloud Stream is quite flexible, and the binder
+works with <literal>spring-cloud-bus</literal>.</simpara>
+</note>
+</chapter>
+<chapter xml:id="_bus_endpoints">
+<title>Bus Endpoints</title>
+<simpara>Spring Cloud Bus provides two endpoints, <literal>/actuator/bus-refresh</literal> and <literal>/actuator/bus-env</literal>
+that correspond to individual actuator endpoints in Spring Cloud Commons,
+<literal>/actuator/refresh</literal> and <literal>/actuator/env</literal> respectively.</simpara>
+<section xml:id="_bus_refresh_endpoint">
+<title>Bus Refresh Endpoint</title>
+<simpara>The <literal>/actuator/bus-refresh</literal> endpoint clears the <literal>RefreshScope</literal> cache and rebinds
+<literal>@ConfigurationProperties</literal>. See the <link linkend="refresh-scope">Refresh Scope</link> documentation for
+more information.</simpara>
+<simpara>To expose the <literal>/actuator/bus-refresh</literal> endpoint, you need to add following configuration to your
+application:</simpara>
+<programlisting language="properties" linenumbering="unnumbered">management.endpoints.web.exposure.include=bus-refresh</programlisting>
+</section>
+<section xml:id="_bus_env_endpoint">
+<title>Bus Env Endpoint</title>
+<simpara>The <literal>/actuator/bus-env</literal> endpoint updates each instances environment with the specified
+key/value pair across multiple instances.</simpara>
+<simpara>To expose the <literal>/actuator/bus-env</literal> endpoint, you need to add following configuration to your
+application:</simpara>
+<programlisting language="properties" linenumbering="unnumbered">management.endpoints.web.exposure.include=bus-env</programlisting>
+<simpara>The <literal>/actuator/bus-env</literal> endpoint accepts <literal>POST</literal> requests with the following shape:</simpara>
+<programlisting language="json" linenumbering="unnumbered">{
+	"name": "key1",
+	"value": "value1"
+}</programlisting>
+</section>
+</chapter>
+<chapter xml:id="_addressing_an_instance">
+<title>Addressing an Instance</title>
+<simpara>Each instance of the application has a service ID, whose value can be set with
+<literal>spring.cloud.bus.id</literal> and whose value is expected to be a colon-separated list of
+identifiers, in order from least specific to most specific. The default value is
+constructed from the environment as a combination of the <literal>spring.application.name</literal> and
+<literal>server.port</literal> (or <literal>spring.application.index</literal>, if set). The default value of the ID is
+constructed in the form of <literal>app:index:id</literal>, where:</simpara>
+<itemizedlist>
+<listitem>
+<simpara><literal>app</literal> is the <literal>vcap.application.name</literal>, if it exists, or <literal>spring.application.name</literal></simpara>
+</listitem>
+<listitem>
+<simpara><literal>index</literal> is the <literal>vcap.application.instance_index</literal>, if it exists,
+<literal>spring.application.index</literal>, <literal>local.server.port</literal>, <literal>server.port</literal>, or <literal>0</literal> (in that order).</simpara>
+</listitem>
+<listitem>
+<simpara><literal>id</literal> is the <literal>vcap.application.instance_id</literal>, if it exists, or a random value.</simpara>
+</listitem>
+</itemizedlist>
+<simpara>The HTTP endpoints accept a <quote>destination</quote> path parameter, such as
+<literal>/bus-refresh/customers:9000</literal>, where <literal>destination</literal> is a service ID. If the ID
+is owned by an instance on the bus, it processes the message, and all other instances
+ignore it.</simpara>
+</chapter>
+<chapter xml:id="_addressing_all_instances_of_a_service">
+<title>Addressing All Instances of a Service</title>
+<simpara>The <quote>destination</quote> parameter is used in a Spring <literal>PathMatcher</literal> (with the path separator
+as a colon&#8201;&#8212;&#8201;<literal>:</literal>) to determine if an instance processes the message. Using the example
+from earlier, <literal>/bus-env/customers:**</literal> targets all instances of the
+<quote>customers</quote> service regardless of the rest of the service ID.</simpara>
+</chapter>
+<chapter xml:id="_service_id_must_be_unique">
+<title>Service ID Must Be Unique</title>
+<simpara>The bus tries twice to eliminate processing an event&#8201;&#8212;&#8201;once from the original
+<literal>ApplicationEvent</literal> and once from the queue. To do so, it checks the sending service ID
+against the current service ID. If multiple instances of a service have the same ID,
+events are not processed. When running on a local machine, each service is on a different
+port, and that port is part of the ID. Cloud Foundry supplies an index to differentiate.
+To ensure that the ID is unique outside Cloud Foundry, set <literal>spring.application.index</literal> to
+something unique for each instance of a service.</simpara>
+</chapter>
+<chapter xml:id="_customizing_the_message_broker">
+<title>Customizing the Message Broker</title>
+<simpara>Spring Cloud Bus uses <link xl:href="https://cloud.spring.io/spring-cloud-stream">Spring Cloud Stream</link> to
+broadcast the messages. So, to get messages to flow, you need only include the binder
+implementation of your choice in the classpath. There are convenient starters for the bus
+with AMQP (RabbitMQ) and Kafka (<literal>spring-cloud-starter-bus-[amqp|kafka]</literal>). Generally
+speaking, Spring Cloud Stream relies on Spring Boot autoconfiguration conventions for
+configuring middleware. For instance, the AMQP broker address can be changed with
+<literal>spring.rabbitmq.*</literal> configuration properties. Spring Cloud Bus has a handful of
+native configuration properties in <literal>spring.cloud.bus.*</literal> (for example,
+<literal>spring.cloud.bus.destination</literal> is the name of the topic to use as the external
+middleware). Normally, the defaults suffice.</simpara>
+<simpara>To learn more about how to customize the message broker settings, consult the Spring Cloud
+Stream documentation.</simpara>
+</chapter>
+<chapter xml:id="_tracing_bus_events">
+<title>Tracing Bus Events</title>
+<simpara>Bus events (subclasses of <literal>RemoteApplicationEvent</literal>) can be traced by setting
+<literal>spring.cloud.bus.trace.enabled=true</literal>. If you do so, the Spring Boot <literal>TraceRepository</literal>
+(if it is present) shows each event sent and all the acks from each service instance. The
+following example comes from the <literal>/trace</literal> endpoint:</simpara>
+<programlisting language="json" linenumbering="unnumbered">{
+  "timestamp": "2015-11-26T10:24:44.411+0000",
+  "info": {
+    "signal": "spring.cloud.bus.ack",
+    "type": "RefreshRemoteApplicationEvent",
+    "id": "c4d374b7-58ea-4928-a312-31984def293b",
+    "origin": "stores:8081",
+    "destination": "*:**"
+  }
+  },
+  {
+  "timestamp": "2015-11-26T10:24:41.864+0000",
+  "info": {
+    "signal": "spring.cloud.bus.sent",
+    "type": "RefreshRemoteApplicationEvent",
+    "id": "c4d374b7-58ea-4928-a312-31984def293b",
+    "origin": "customers:9000",
+    "destination": "*:**"
+  }
+  },
+  {
+  "timestamp": "2015-11-26T10:24:41.862+0000",
+  "info": {
+    "signal": "spring.cloud.bus.ack",
+    "type": "RefreshRemoteApplicationEvent",
+    "id": "c4d374b7-58ea-4928-a312-31984def293b",
+    "origin": "customers:9000",
+    "destination": "*:**"
+  }
+}</programlisting>
+<simpara>The preceding trace shows that a <literal>RefreshRemoteApplicationEvent</literal> was sent from
+<literal>customers:9000</literal>, broadcast to all services, and received (acked) by <literal>customers:9000</literal> and
+<literal>stores:8081</literal>.</simpara>
+<simpara>To handle the ack signals yourself, you could add an <literal>@EventListener</literal> for the
+<literal>AckRemoteApplicationEvent</literal> and <literal>SentApplicationEvent</literal> types to your app (and enable
+tracing). Alternatively, you could tap into the <literal>TraceRepository</literal> and mine the data from
+there.</simpara>
+<note>
+<simpara>Any Bus application can trace acks. However, sometimes, it is
+useful to do this in a central service that can do more complex
+queries on the data or forward it to a specialized tracing service.</simpara>
+</note>
+</chapter>
+<chapter xml:id="_broadcasting_your_own_events">
+<title>Broadcasting Your Own Events</title>
+<simpara>The Bus can carry any event of type <literal>RemoteApplicationEvent</literal>. The default transport is
+JSON, and the deserializer needs to know which types are going to be used ahead of time.
+To register a new type, you must put it in a subpackage of
+<literal>org.springframework.cloud.bus.event</literal>.</simpara>
+<simpara>To customise the event name, you can use <literal>@JsonTypeName</literal> on your custom class or rely on
+the default strategy, which is to use the simple name of the class.</simpara>
+<note>
+<simpara>Both the producer and the consumer need access to the class definition.</simpara>
+</note>
+<section xml:id="_registering_events_in_custom_packages">
+<title>Registering events in custom packages</title>
+<simpara>If you cannot or do not want to use a subpackage of <literal>org.springframework.cloud.bus.event</literal>
+for your custom events, you must specify which packages to scan for events of type
+<literal>RemoteApplicationEvent</literal> by using the <literal>@RemoteApplicationEventScan</literal> annotation. Packages
+specified with <literal>@RemoteApplicationEventScan</literal> include subpackages.</simpara>
+<simpara>For example, consider the following custom event, called <literal>MyEvent</literal>:</simpara>
+<programlisting language="java" linenumbering="unnumbered">package com.acme;
+
+public class MyEvent extends RemoteApplicationEvent {
+    ...
+}</programlisting>
+<simpara>You can register that event with the deserializer in the following way:</simpara>
+<programlisting language="java" linenumbering="unnumbered">package com.acme;
+
+@Configuration
+@RemoteApplicationEventScan
+public class BusConfiguration {
+    ...
+}</programlisting>
+<simpara>Without specifying a value, the package of the class where <literal>@RemoteApplicationEventScan</literal>
+is used is registered. In this example, <literal>com.acme</literal> is registered by using the package of
+<literal>BusConfiguration</literal>.</simpara>
+<simpara>You can also explicitly specify the packages to scan by using the <literal>value</literal>, <literal>basePackages</literal>
+or <literal>basePackageClasses</literal> properties on <literal>@RemoteApplicationEventScan</literal>, as shown in the
+following example:</simpara>
+<programlisting language="java" linenumbering="unnumbered">package com.acme;
+
+@Configuration
+//@RemoteApplicationEventScan({"com.acme", "foo.bar"})
+//@RemoteApplicationEventScan(basePackages = {"com.acme", "foo.bar", "fizz.buzz"})
+@RemoteApplicationEventScan(basePackageClasses = BusConfiguration.class)
+public class BusConfiguration {
+    ...
+}</programlisting>
+<simpara>All of the preceding examples of <literal>@RemoteApplicationEventScan</literal> are equivalent, in that the
+<literal>com.acme</literal> package is registered by explicitly specifying the packages on
+<literal>@RemoteApplicationEventScan</literal>.</simpara>
+<note>
+<simpara>You can specify multiple base packages to scan.</simpara>
+</note>
+</section>
+</chapter>
+</book>
