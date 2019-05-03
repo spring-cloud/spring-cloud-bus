@@ -21,7 +21,6 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnEnabledEndpoint;
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
-import org.springframework.boot.actuate.trace.http.HttpTraceRepository;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -32,12 +31,14 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.cloud.autoconfigure.LifecycleMvcEndpointAutoConfiguration;
 import org.springframework.cloud.bus.endpoint.EnvironmentBusEndpoint;
 import org.springframework.cloud.bus.endpoint.RefreshBusEndpoint;
+import org.springframework.cloud.bus.endpoint.TraceBusEndpoint;
 import org.springframework.cloud.bus.event.AckRemoteApplicationEvent;
 import org.springframework.cloud.bus.event.EnvironmentChangeListener;
 import org.springframework.cloud.bus.event.RefreshListener;
 import org.springframework.cloud.bus.event.RemoteApplicationEvent;
 import org.springframework.cloud.bus.event.SentApplicationEvent;
 import org.springframework.cloud.bus.event.TraceListener;
+import org.springframework.cloud.bus.trace.BusEventTraceRepository;
 import org.springframework.cloud.context.environment.EnvironmentManager;
 import org.springframework.cloud.context.refresh.ContextRefresher;
 import org.springframework.cloud.context.scope.refresh.RefreshScope;
@@ -183,7 +184,8 @@ public class BusAutoConfiguration implements ApplicationEventPublisherAware {
 	}
 
 	@Bean
-	@ConditionalOnProperty(value = "spring.cloud.bus.refresh.enabled", matchIfMissing = true)
+	@ConditionalOnProperty(value = "spring.cloud.bus.refresh.enabled",
+			matchIfMissing = true)
 	@ConditionalOnBean(ContextRefresher.class)
 	public RefreshListener refreshListener(ContextRefresher contextRefresher) {
 		return new RefreshListener(contextRefresher);
@@ -233,13 +235,20 @@ public class BusAutoConfiguration implements ApplicationEventPublisherAware {
 
 	@Configuration
 	@ConditionalOnClass({ Endpoint.class })
-	@ConditionalOnBean(HttpTraceRepository.class)
-	@ConditionalOnProperty(value = "spring.cloud.bus.trace.enabled", matchIfMissing = false)
+	@ConditionalOnBean(BusEventTraceRepository.class)
+	@ConditionalOnProperty(value = "spring.cloud.bus.trace.enabled",
+			matchIfMissing = false)
 	protected static class BusAckTraceConfiguration {
 
 		@Bean
 		@ConditionalOnMissingBean
-		public TraceListener ackTraceListener(HttpTraceRepository repository) {
+		public TraceBusEndpoint traceBusEndpoint(BusEventTraceRepository repository) {
+			return new TraceBusEndpoint(repository);
+		}
+
+		@Bean
+		@ConditionalOnMissingBean
+		public TraceListener ackTraceListener(BusEventTraceRepository repository) {
 			return new TraceListener(repository);
 		}
 
@@ -251,7 +260,8 @@ public class BusAutoConfiguration implements ApplicationEventPublisherAware {
 	protected static class BusEnvironmentConfiguration {
 
 		@Bean
-		@ConditionalOnProperty(value = "spring.cloud.bus.env.enabled", matchIfMissing = true)
+		@ConditionalOnProperty(value = "spring.cloud.bus.env.enabled",
+				matchIfMissing = true)
 		public EnvironmentChangeListener environmentChangeListener() {
 			return new EnvironmentChangeListener();
 		}

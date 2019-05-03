@@ -14,18 +14,14 @@
  * limitations under the License.
  */
 
-package org.springframework.cloud.bus.trace;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
-import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
-import org.springframework.boot.actuate.endpoint.annotation.Selector;
-import org.springframework.boot.actuate.endpoint.annotation.WriteOperation;
-import org.springframework.cloud.bus.event.RefreshRemoteApplicationEvent;
-import org.springframework.context.ApplicationEventPublisher;
+package org.springframework.cloud.bus.endpoint;
 
 import java.util.List;
 import java.util.Map;
+
+import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
+import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
+import org.springframework.cloud.bus.trace.BusEventTraceRepository;
 
 /**
  * @author Vibhor Tayal
@@ -33,11 +29,14 @@ import java.util.Map;
 @Endpoint(id = "bus-trace")
 public class TraceBusEndpoint {
 
-	@Autowired
 	private final BusEventTraceRepository busEventTraceRepository;
-	
+
+	public TraceBusEndpoint(BusEventTraceRepository repository) {
+		this.busEventTraceRepository = repository;
+	}
+
 	@ReadOperation
-	public List<Map<String,Object>> busTraceEvents() {
+	public List<Map<String, Object>> getBusTraceEvents() {
 		return busEventTraceRepository.findAll();
 	}
 
