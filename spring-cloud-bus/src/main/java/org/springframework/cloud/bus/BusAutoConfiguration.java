@@ -236,15 +236,8 @@ public class BusAutoConfiguration implements ApplicationEventPublisherAware {
 	@Configuration
 	@ConditionalOnClass({ Endpoint.class })
 	@ConditionalOnBean(BusEventTraceRepository.class)
-	@ConditionalOnProperty(value = "spring.cloud.bus.trace.enabled",
-			matchIfMissing = false)
+	@ConditionalOnProperty(value = "spring.cloud.bus.trace.enabled", matchIfMissing = false)
 	protected static class BusAckTraceConfiguration {
-
-		@Bean
-		@ConditionalOnMissingBean
-		public TraceBusEndpoint traceBusEndpoint(BusEventTraceRepository repository) {
-			return new TraceBusEndpoint(repository);
-		}
 
 		@Bean
 		@ConditionalOnMissingBean
@@ -252,6 +245,11 @@ public class BusAutoConfiguration implements ApplicationEventPublisherAware {
 			return new TraceListener(repository);
 		}
 
+		@Bean
+		@ConditionalOnMissingBean
+		public TraceBusEndpoint traceBusEndpoint(BusEventTraceRepository repository) {
+			return new TraceBusEndpoint(repository);
+		}
 	}
 
 	@Configuration
@@ -260,8 +258,7 @@ public class BusAutoConfiguration implements ApplicationEventPublisherAware {
 	protected static class BusEnvironmentConfiguration {
 
 		@Bean
-		@ConditionalOnProperty(value = "spring.cloud.bus.env.enabled",
-				matchIfMissing = true)
+		@ConditionalOnProperty(value = "spring.cloud.bus.env.enabled", matchIfMissing = true)
 		public EnvironmentChangeListener environmentChangeListener() {
 			return new EnvironmentChangeListener();
 		}
