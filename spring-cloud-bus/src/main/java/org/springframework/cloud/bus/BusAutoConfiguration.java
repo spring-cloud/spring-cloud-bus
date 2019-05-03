@@ -184,8 +184,7 @@ public class BusAutoConfiguration implements ApplicationEventPublisherAware {
 	}
 
 	@Bean
-	@ConditionalOnProperty(value = "spring.cloud.bus.refresh.enabled",
-			matchIfMissing = true)
+	@ConditionalOnProperty(value = "spring.cloud.bus.refresh.enabled", matchIfMissing = true)
 	@ConditionalOnBean(ContextRefresher.class)
 	public RefreshListener refreshListener(ContextRefresher contextRefresher) {
 		return new RefreshListener(contextRefresher);
