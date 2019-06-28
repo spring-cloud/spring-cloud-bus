@@ -115,8 +115,8 @@ specified with <code class="literal">@RemoteApplicationEventScan</code> include 
     ...
 }</pre><p>You can register that event with the deserializer in the following way:</p><pre class="programlisting"><span xmlns:d="http://docbook.org/ns/docbook" class="hl-keyword">package</span> com.acme;
 
-<em><span class="hl-annotation" style="color: gray">@Configuration</span></em>
-<em><span class="hl-annotation" style="color: gray">@RemoteApplicationEventScan</span></em>
+<xslthl:annotation xmlns:xslthl="http://xslthl.sourceforge.net/">@Configuration</xslthl:annotation>
+<xslthl:annotation xmlns:xslthl="http://xslthl.sourceforge.net/">@RemoteApplicationEventScan</xslthl:annotation>
 <span xmlns:d="http://docbook.org/ns/docbook" class="hl-keyword">public</span> <span xmlns:d="http://docbook.org/ns/docbook" class="hl-keyword">class</span> BusConfiguration {
     ...
 }</pre><p>Without specifying a value, the package of the class where <code class="literal">@RemoteApplicationEventScan</code>
@@ -125,10 +125,10 @@ is used is registered. In this example, <code class="literal">com.acme</code> is
 or <code class="literal">basePackageClasses</code> properties on <code class="literal">@RemoteApplicationEventScan</code>, as shown in the
 following example:</p><pre class="programlisting"><span xmlns:d="http://docbook.org/ns/docbook" class="hl-keyword">package</span> com.acme;
 
-<em><span class="hl-annotation" style="color: gray">@Configuration</span></em>
+<xslthl:annotation xmlns:xslthl="http://xslthl.sourceforge.net/">@Configuration</xslthl:annotation>
 <span xmlns:d="http://docbook.org/ns/docbook" class="hl-comment">//@RemoteApplicationEventScan({"com.acme", "foo.bar"})</span>
 <span xmlns:d="http://docbook.org/ns/docbook" class="hl-comment">//@RemoteApplicationEventScan(basePackages = {"com.acme", "foo.bar", "fizz.buzz"})</span>
-<em><span class="hl-annotation" style="color: gray">@RemoteApplicationEventScan(basePackageClasses = BusConfiguration.class)</span></em>
+<xslthl:annotation xmlns:xslthl="http://xslthl.sourceforge.net/">@RemoteApplicationEventScan(basePackageClasses = BusConfiguration.class)</xslthl:annotation>
 <span xmlns:d="http://docbook.org/ns/docbook" class="hl-keyword">public</span> <span xmlns:d="http://docbook.org/ns/docbook" class="hl-keyword">class</span> BusConfiguration {
     ...
 }</pre><p>All of the preceding examples of <code class="literal">@RemoteApplicationEventScan</code> are equivalent, in that the
