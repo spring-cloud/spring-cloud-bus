@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 1.5.7.1">
+<title>Spring Cloud Bus</title>
+<link rel="stylesheet" href="css/spring.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<style>
+.hidden {
+	display: none;
+}
+
+.switch {
+	border-width: 1px 1px 0 1px;
+	border-style: solid;
+	border-color: #7a2518;
+	display: inline-block;
+}
+
+.switch--item {
+	padding: 10px;
+	background-color: #ffffff;
+	color: #7a2518;
+	display: inline-block;
+	cursor: pointer;
+}
+
+.switch--item:not(:first-child) {
+	border-width: 0 0 0 1px;
+	border-style: solid;
+	border-color: #7a2518;
+}
+
+.switch--item.selected {
+	background-color: #7a2519;
+	color: #ffffff;
+}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js"></script>
+<script type="text/javascript">
+function addBlockSwitches() {
+	$('.primary').each(function() {
+		primary = $(this);
+		createSwitchItem(primary, createBlockSwitch(primary)).item.addClass("selected");
+		primary.children('.title').remove();
+	});
+	$('.secondary').each(function(idx, node) {
+		secondary = $(node);
+		primary = findPrimary(secondary);
+		switchItem = createSwitchItem(secondary, primary.children('.switch'));
+		switchItem.content.addClass('hidden');
+		findPrimary(secondary).append(switchItem.content);
+		secondary.remove();
+	});
+}
+
+function createBlockSwitch(primary) {
+	blockSwitch = $('<div class="switch"></div>');
+	primary.prepend(blockSwitch);
+	return blockSwitch;
+}
+
+function findPrimary(secondary) {
+	candidate = secondary.prev();
+	while (!candidate.is('.primary')) {
+		candidate = candidate.prev();
+	}
+	return candidate;
+}
+
+function createSwitchItem(block, blockSwitch) {
+	blockName = block.children('.title').text();
+	content = block.children('.content').first().append(block.next('.colist'));
+	item = $('<div class="switch--item">' + blockName + '</div>');
+	item.on('click', '', content, function(e) {
+		$(this).addClass('selected');
+		$(this).siblings().removeClass('selected');
+		e.data.siblings('.content').addClass('hidden');
+		e.data.removeClass('hidden');
+	});
+	blockSwitch.append(item);
+	return {'item': item, 'content': content};
+}
+
+$(addBlockSwitches);
+</script>
+
+</head>
+<body class="book toc2 toc-left">
+<div id="header">
+<h1>Spring Cloud Bus</h1>
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_quick_start">Quick Start</a></li>
+<li><a href="#_bus_endpoints">Bus Endpoints</a>
+<ul class="sectlevel2">
+<li><a href="#_bus_refresh_endpoint">Bus Refresh Endpoint</a></li>
+<li><a href="#_bus_env_endpoint">Bus Env Endpoint</a></li>
+</ul>
+</li>
+<li><a href="#_addressing_an_instance">Addressing an Instance</a></li>
+<li><a href="#_addressing_all_instances_of_a_service">Addressing All Instances of a Service</a></li>
+<li><a href="#_service_id_must_be_unique">Service ID Must Be Unique</a></li>
+<li><a href="#_customizing_the_message_broker">Customizing the Message Broker</a></li>
+<li><a href="#_tracing_bus_events">Tracing Bus Events</a></li>
+<li><a href="#_broadcasting_your_own_events">Broadcasting Your Own Events</a>
+<ul class="sectlevel2">
+<li><a href="#_registering_events_in_custom_packages">Registering events in custom packages</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Spring Cloud Bus links the nodes of a distributed system with a lightweight message
+broker. This broker can then be used to broadcast state changes (such as configuration
+changes) or other management instructions. A key idea is that the bus is like a
+distributed actuator for a Spring Boot application that is scaled out. However, it can
+also be used as a communication channel between apps. This project provides starters for
+either an AMQP broker or Kafka as the transport.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Spring Cloud is released under the non-restrictive Apache 2.0 license. If you would like to contribute to this section of the documentation or if you find an error, please find the source code and issue trackers in the project at <a href="https://github.com/spring-cloud/spring-cloud-config/tree/master/docs/src/main/asciidoc">github</a>.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_quick_start"><a class="link" href="#_quick_start">Quick Start</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Spring Cloud Bus works by adding Spring Boot autconfiguration if it detects itself on the
+classpath. To enable the bus, add <code>spring-cloud-starter-bus-amqp</code> or
+<code>spring-cloud-starter-bus-kafka</code> to your dependency management. Spring Cloud takes care of
+the rest. Make sure the broker (RabbitMQ or Kafka) is available and configured. When
+running on localhost, you need not do anything. If you run remotely, use Spring Cloud
+Connectors or Spring Boot conventions to define the broker credentials, as shown in the
+following example for Rabbit:</p>
+</div>
+<div class="listingblock">
+<div class="title">application.yml</div>
+<div class="content">
+<pre>spring:
+  rabbitmq:
+    host: mybroker.com
+    port: 5672
+    username: user
+    password: secret</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The bus currently supports sending messages to all nodes listening or all nodes for a
+particular service (as defined by Eureka). The <code>/bus/*</code> actuator namespace has some HTTP
+endpoints. Currently, two are implemented. The first, <code>/bus/env</code>, sends key/value pairs to
+update each node&#8217;s Spring Environment. The second, <code>/bus/refresh</code>, reloads each
+application&#8217;s configuration, as though they had all been pinged on their <code>/refresh</code>
+endpoint.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The Spring Cloud Bus starters cover Rabbit and Kafka, because those are the two most
+common implementations. However, Spring Cloud Stream is quite flexible, and the binder
+works with <code>spring-cloud-bus</code>.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_bus_endpoints"><a class="link" href="#_bus_endpoints">Bus Endpoints</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Spring Cloud Bus provides two endpoints, <code>/actuator/bus-refresh</code> and <code>/actuator/bus-env</code>
+that correspond to individual actuator endpoints in Spring Cloud Commons,
+<code>/actuator/refresh</code> and <code>/actuator/env</code> respectively.</p>
+</div>
+<div class="sect2">
+<h3 id="_bus_refresh_endpoint"><a class="link" href="#_bus_refresh_endpoint">Bus Refresh Endpoint</a></h3>
+<div class="paragraph">
+<p>The <code>/actuator/bus-refresh</code> endpoint clears the <code>RefreshScope</code> cache and rebinds
+<code>@ConfigurationProperties</code>. See the <a href="#refresh-scope">Refresh Scope</a> documentation for
+more information.</p>
+</div>
+<div class="paragraph">
+<p>To expose the <code>/actuator/bus-refresh</code> endpoint, you need to add following configuration to your
+application:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">management.endpoints.web.exposure.include=bus-refresh</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_bus_env_endpoint"><a class="link" href="#_bus_env_endpoint">Bus Env Endpoint</a></h3>
+<div class="paragraph">
+<p>The <code>/actuator/bus-env</code> endpoint updates each instances environment with the specified
+key/value pair across multiple instances.</p>
+</div>
+<div class="paragraph">
+<p>To expose the <code>/actuator/bus-env</code> endpoint, you need to add following configuration to your
+application:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">management.endpoints.web.exposure.include=bus-env</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>/actuator/bus-env</code> endpoint accepts <code>POST</code> requests with the following shape:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+	"name": "key1",
+	"value": "value1"
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_addressing_an_instance"><a class="link" href="#_addressing_an_instance">Addressing an Instance</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Each instance of the application has a service ID, whose value can be set with
+<code>spring.cloud.bus.id</code> and whose value is expected to be a colon-separated list of
+identifiers, in order from least specific to most specific. The default value is
+constructed from the environment as a combination of the <code>spring.application.name</code> and
+<code>server.port</code> (or <code>spring.application.index</code>, if set). The default value of the ID is
+constructed in the form of <code>app:index:id</code>, where:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>app</code> is the <code>vcap.application.name</code>, if it exists, or <code>spring.application.name</code></p>
+</li>
+<li>
+<p><code>index</code> is the <code>vcap.application.instance_index</code>, if it exists,
+<code>spring.application.index</code>, <code>local.server.port</code>, <code>server.port</code>, or <code>0</code> (in that order).</p>
+</li>
+<li>
+<p><code>id</code> is the <code>vcap.application.instance_id</code>, if it exists, or a random value.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The HTTP endpoints accept a &#8220;destination&#8221; path parameter, such as
+<code>/bus-refresh/customers:9000</code>, where <code>destination</code> is a service ID. If the ID
+is owned by an instance on the bus, it processes the message, and all other instances
+ignore it.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_addressing_all_instances_of_a_service"><a class="link" href="#_addressing_all_instances_of_a_service">Addressing All Instances of a Service</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The &#8220;destination&#8221; parameter is used in a Spring <code>PathMatcher</code> (with the path separator
+as a colon&#8201;&#8212;&#8201;<code>:</code>) to determine if an instance processes the message. Using the example
+from earlier, <code>/bus-env/customers:**</code> targets all instances of the
+&#8220;customers&#8221; service regardless of the rest of the service ID.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_service_id_must_be_unique"><a class="link" href="#_service_id_must_be_unique">Service ID Must Be Unique</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The bus tries twice to eliminate processing an event&#8201;&#8212;&#8201;once from the original
+<code>ApplicationEvent</code> and once from the queue. To do so, it checks the sending service ID
+against the current service ID. If multiple instances of a service have the same ID,
+events are not processed. When running on a local machine, each service is on a different
+port, and that port is part of the ID. Cloud Foundry supplies an index to differentiate.
+To ensure that the ID is unique outside Cloud Foundry, set <code>spring.application.index</code> to
+something unique for each instance of a service.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_customizing_the_message_broker"><a class="link" href="#_customizing_the_message_broker">Customizing the Message Broker</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Spring Cloud Bus uses <a href="https://cloud.spring.io/spring-cloud-stream">Spring Cloud Stream</a> to
+broadcast the messages. So, to get messages to flow, you need only include the binder
+implementation of your choice in the classpath. There are convenient starters for the bus
+with AMQP (RabbitMQ) and Kafka (<code>spring-cloud-starter-bus-[amqp|kafka]</code>). Generally
+speaking, Spring Cloud Stream relies on Spring Boot autoconfiguration conventions for
+configuring middleware. For instance, the AMQP broker address can be changed with
+<code>spring.rabbitmq.*</code> configuration properties. Spring Cloud Bus has a handful of
+native configuration properties in <code>spring.cloud.bus.*</code> (for example,
+<code>spring.cloud.bus.destination</code> is the name of the topic to use as the external
+middleware). Normally, the defaults suffice.</p>
+</div>
+<div class="paragraph">
+<p>To learn more about how to customize the message broker settings, consult the Spring Cloud
+Stream documentation.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_tracing_bus_events"><a class="link" href="#_tracing_bus_events">Tracing Bus Events</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Bus events (subclasses of <code>RemoteApplicationEvent</code>) can be traced by setting
+<code>spring.cloud.bus.trace.enabled=true</code>. If you do so, the Spring Boot <code>TraceRepository</code>
+(if it is present) shows each event sent and all the acks from each service instance. The
+following example comes from the <code>/trace</code> endpoint:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+  "timestamp": "2015-11-26T10:24:44.411+0000",
+  "info": {
+    "signal": "spring.cloud.bus.ack",
+    "type": "RefreshRemoteApplicationEvent",
+    "id": "c4d374b7-58ea-4928-a312-31984def293b",
+    "origin": "stores:8081",
+    "destination": "*:**"
+  }
+  },
+  {
+  "timestamp": "2015-11-26T10:24:41.864+0000",
+  "info": {
+    "signal": "spring.cloud.bus.sent",
+    "type": "RefreshRemoteApplicationEvent",
+    "id": "c4d374b7-58ea-4928-a312-31984def293b",
+    "origin": "customers:9000",
+    "destination": "*:**"
+  }
+  },
+  {
+  "timestamp": "2015-11-26T10:24:41.862+0000",
+  "info": {
+    "signal": "spring.cloud.bus.ack",
+    "type": "RefreshRemoteApplicationEvent",
+    "id": "c4d374b7-58ea-4928-a312-31984def293b",
+    "origin": "customers:9000",
+    "destination": "*:**"
+  }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The preceding trace shows that a <code>RefreshRemoteApplicationEvent</code> was sent from
+<code>customers:9000</code>, broadcast to all services, and received (acked) by <code>customers:9000</code> and
+<code>stores:8081</code>.</p>
+</div>
+<div class="paragraph">
+<p>To handle the ack signals yourself, you could add an <code>@EventListener</code> for the
+<code>AckRemoteApplicationEvent</code> and <code>SentApplicationEvent</code> types to your app (and enable
+tracing). Alternatively, you could tap into the <code>TraceRepository</code> and mine the data from
+there.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Any Bus application can trace acks. However, sometimes, it is
+useful to do this in a central service that can do more complex
+queries on the data or forward it to a specialized tracing service.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_broadcasting_your_own_events"><a class="link" href="#_broadcasting_your_own_events">Broadcasting Your Own Events</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The Bus can carry any event of type <code>RemoteApplicationEvent</code>. The default transport is
+JSON, and the deserializer needs to know which types are going to be used ahead of time.
+To register a new type, you must put it in a subpackage of
+<code>org.springframework.cloud.bus.event</code>.</p>
+</div>
+<div class="paragraph">
+<p>To customise the event name, you can use <code>@JsonTypeName</code> on your custom class or rely on
+the default strategy, which is to use the simple name of the class.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Both the producer and the consumer need access to the class definition.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_registering_events_in_custom_packages"><a class="link" href="#_registering_events_in_custom_packages">Registering events in custom packages</a></h3>
+<div class="paragraph">
+<p>If you cannot or do not want to use a subpackage of <code>org.springframework.cloud.bus.event</code>
+for your custom events, you must specify which packages to scan for events of type
+<code>RemoteApplicationEvent</code> by using the <code>@RemoteApplicationEventScan</code> annotation. Packages
+specified with <code>@RemoteApplicationEventScan</code> include subpackages.</p>
+</div>
+<div class="paragraph">
+<p>For example, consider the following custom event, called <code>MyEvent</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package com.acme;
+
+public class MyEvent extends RemoteApplicationEvent {
+    ...
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can register that event with the deserializer in the following way:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package com.acme;
+
+@Configuration
+@RemoteApplicationEventScan
+public class BusConfiguration {
+    ...
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Without specifying a value, the package of the class where <code>@RemoteApplicationEventScan</code>
+is used is registered. In this example, <code>com.acme</code> is registered by using the package of
+<code>BusConfiguration</code>.</p>
+</div>
+<div class="paragraph">
+<p>You can also explicitly specify the packages to scan by using the <code>value</code>, <code>basePackages</code>
+or <code>basePackageClasses</code> properties on <code>@RemoteApplicationEventScan</code>, as shown in the
+following example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package com.acme;
+
+@Configuration
+//@RemoteApplicationEventScan({"com.acme", "foo.bar"})
+//@RemoteApplicationEventScan(basePackages = {"com.acme", "foo.bar", "fizz.buzz"})
+@RemoteApplicationEventScan(basePackageClasses = BusConfiguration.class)
+public class BusConfiguration {
+    ...
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>All of the preceding examples of <code>@RemoteApplicationEventScan</code> are equivalent, in that the
+<code>com.acme</code> package is registered by explicitly specifying the packages on
+<code>@RemoteApplicationEventScan</code>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+You can specify multiple base packages to scan.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script type="text/javascript" src="js/tocbot/tocbot.min.js"></script>
+<script type="text/javascript" src="js/toc.js"></script>
+<link rel="stylesheet" href="js/highlight/styles/atom-one-dark-reasonable.min.css">
+<script src="js/highlight/highlight.min.js"></script>
+<script>hljs.initHighlighting()</script>
+</body>
+</html>
