@@ -47,7 +47,7 @@ public class ServiceMatcherTests {
 		properties.setId(id);
 		DefaultBusPathMatcher pathMatcher = new DefaultBusPathMatcher(
 				new AntPathMatcher(":"));
-		this.matcher = new ServiceMatcher(pathMatcher, properties.getId());
+		this.matcher = new ServiceMatcher(pathMatcher, properties);
 	}
 
 	@Test

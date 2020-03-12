@@ -19,6 +19,7 @@ package org.springframework.cloud.bus.endpoint;
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.actuate.endpoint.annotation.Selector;
 import org.springframework.boot.actuate.endpoint.annotation.WriteOperation;
+import org.springframework.cloud.bus.BusProperties;
 import org.springframework.cloud.bus.event.RefreshRemoteApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 
@@ -28,8 +29,9 @@ import org.springframework.context.ApplicationEventPublisher;
 @Endpoint(id = "bus-refresh") // TODO: document new id
 public class RefreshBusEndpoint extends AbstractBusEndpoint {
 
-	public RefreshBusEndpoint(ApplicationEventPublisher context, String id) {
-		super(context, id);
+	public RefreshBusEndpoint(ApplicationEventPublisher context,
+			BusProperties busProperties) {
+		super(context, busProperties);
 	}
 
 	@WriteOperation

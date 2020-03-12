@@ -194,8 +194,8 @@ public class BusAutoConfiguration implements ApplicationEventPublisherAware {
 				BusProperties properties, Environment environment) {
 			String[] configNames = environment.getProperty(CLOUD_CONFIG_NAME_PROPERTY,
 					String[].class, new String[] {});
-			ServiceMatcher serviceMatcher = new ServiceMatcher(pathMatcher,
-					properties.getId(), configNames);
+			ServiceMatcher serviceMatcher = new ServiceMatcher(pathMatcher, properties,
+					configNames);
 			return serviceMatcher;
 		}
 
@@ -236,7 +236,7 @@ public class BusAutoConfiguration implements ApplicationEventPublisherAware {
 			@ConditionalOnAvailableEndpoint
 			public EnvironmentBusEndpoint environmentBusEndpoint(
 					ApplicationContext context, BusProperties bus) {
-				return new EnvironmentBusEndpoint(context, bus.getId());
+				return new EnvironmentBusEndpoint(context, bus);
 			}
 
 		}

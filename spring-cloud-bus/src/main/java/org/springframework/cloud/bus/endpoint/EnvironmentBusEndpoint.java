@@ -22,6 +22,7 @@ import java.util.Map;
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.actuate.endpoint.annotation.Selector;
 import org.springframework.boot.actuate.endpoint.annotation.WriteOperation;
+import org.springframework.cloud.bus.BusProperties;
 import org.springframework.cloud.bus.event.EnvironmentChangeRemoteApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 
@@ -31,8 +32,9 @@ import org.springframework.context.ApplicationEventPublisher;
 @Endpoint(id = "bus-env") // TODO: document
 public class EnvironmentBusEndpoint extends AbstractBusEndpoint {
 
-	public EnvironmentBusEndpoint(ApplicationEventPublisher context, String id) {
-		super(context, id);
+	public EnvironmentBusEndpoint(ApplicationEventPublisher context,
+			BusProperties busProperties) {
+		super(context, busProperties);
 	}
 
 	@WriteOperation

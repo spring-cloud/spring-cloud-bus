@@ -18,6 +18,8 @@ package org.springframework.cloud.bus.endpoint;
 
 import org.junit.Test;
 
+import org.springframework.cloud.bus.BusProperties;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -27,7 +29,9 @@ public class RefreshBusEndpointTests {
 
 	@Test
 	public void instanceId() throws Exception {
-		RefreshBusEndpoint endpoint = new RefreshBusEndpoint(null, "foo");
+		BusProperties busProperties = new BusProperties();
+		busProperties.setId("foo");
+		RefreshBusEndpoint endpoint = new RefreshBusEndpoint(null, busProperties);
 		assertThat(endpoint.getInstanceId()).isEqualTo("foo");
 	}
 

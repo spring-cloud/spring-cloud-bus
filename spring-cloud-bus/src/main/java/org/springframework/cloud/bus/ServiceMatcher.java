@@ -26,22 +26,23 @@ public class ServiceMatcher {
 
 	private final PathMatcher matcher;
 
-	private final String id;
+	private final BusProperties busProperties;
 
 	private String[] configNames = new String[] {};
 
-	public ServiceMatcher(PathMatcher matcher, String id) {
+	public ServiceMatcher(PathMatcher matcher, BusProperties busProperties) {
 		this.matcher = matcher;
-		this.id = id;
+		this.busProperties = busProperties;
 	}
 
-	public ServiceMatcher(PathMatcher matcher, String id, String[] configNames) {
-		this(matcher, id);
+	public ServiceMatcher(PathMatcher matcher, BusProperties busProperties,
+			String[] configNames) {
+		this(matcher, busProperties);
 
-		int colonIndex = id.indexOf(":");
+		int colonIndex = busProperties.getId().indexOf(":");
 		if (colonIndex >= 0) {
 			// if the id contains profiles and port, append them to the config names
-			String profilesAndPort = id.substring(colonIndex);
+			String profilesAndPort = busProperties.getId().substring(colonIndex);
 			for (int i = 0; i < configNames.length; i++) {
 				configNames[i] = configNames[i] + profilesAndPort;
 			}
@@ -73,7 +74,7 @@ public class ServiceMatcher {
 	}
 
 	public String getServiceId() {
-		return this.id;
+		return busProperties.getId();
 	}
 
 }

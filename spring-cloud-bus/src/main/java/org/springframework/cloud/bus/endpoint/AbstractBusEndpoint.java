@@ -16,6 +16,7 @@
 
 package org.springframework.cloud.bus.endpoint;
 
+import org.springframework.cloud.bus.BusProperties;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 
@@ -26,15 +27,16 @@ public class AbstractBusEndpoint {
 
 	private ApplicationEventPublisher context;
 
-	private String appId;
+	private BusProperties busProperties;
 
-	public AbstractBusEndpoint(ApplicationEventPublisher context, String appId) {
+	public AbstractBusEndpoint(ApplicationEventPublisher context,
+			BusProperties busProperties) {
 		this.context = context;
-		this.appId = appId;
+		this.busProperties = busProperties;
 	}
 
 	protected String getInstanceId() {
-		return this.appId;
+		return busProperties.getId();
 	}
 
 	protected void publish(ApplicationEvent event) {

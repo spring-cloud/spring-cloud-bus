@@ -56,7 +56,7 @@ public class BusRefreshAutoConfiguration {
 		@ConditionalOnAvailableEndpoint
 		public RefreshBusEndpoint refreshBusEndpoint(ApplicationContext context,
 				BusProperties bus) {
-			return new RefreshBusEndpoint(context, bus.getId());
+			return new RefreshBusEndpoint(context, bus);
 		}
 
 	}
