@@ -65,6 +65,8 @@ public class RefreshListenerIntegrationTests {
 	}
 
 	@SpringBootApplication
-	static class MyApp {}
+	static class MyApp {
+
+	}
 
 }
