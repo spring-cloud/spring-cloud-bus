@@ -13,3 +13,5 @@
 
 :sc-ext: java
 :project-full-name: Spring Cloud Bus
+
+:docslink: https://github.com/spring-cloud/spring-cloud-bus
