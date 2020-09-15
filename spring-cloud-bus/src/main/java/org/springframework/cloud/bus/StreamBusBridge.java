@@ -17,9 +17,24 @@
 package org.springframework.cloud.bus;
 
 import org.springframework.cloud.bus.event.RemoteApplicationEvent;
+import org.springframework.cloud.stream.function.StreamBridge;
+import org.springframework.messaging.support.MessageBuilder;
 
-public interface BusBridge {
+public class StreamBusBridge {
 
-	void send(RemoteApplicationEvent event);
+	private final StreamBridge streamBridge;
+
+	private final BusProperties properties;
+
+	public StreamBusBridge(StreamBridge streamBridge, BusProperties properties) {
+		this.streamBridge = streamBridge;
+		this.properties = properties;
+	}
+
+	public void send(RemoteApplicationEvent event) {
+		// TODO: configurable mimetype?
+		this.streamBridge.send(properties.getDestination(),
+				MessageBuilder.withPayload(event).build());
+	}
 
 }

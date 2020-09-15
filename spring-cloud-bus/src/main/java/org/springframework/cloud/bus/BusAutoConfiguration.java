@@ -52,12 +52,21 @@ import org.springframework.context.annotation.Configuration;
 public class BusAutoConfiguration {
 
 	@Bean
-	public BusBridge busBridge(ServiceMatcher serviceMatcher, StreamBridge streamBridge,
+	@ConditionalOnMissingBean(BusBridge.class)
+	public StreamBusBridge streamBusBridge(StreamBridge streamBridge,
 			BusProperties properties) {
-		return new BusBridge(serviceMatcher, streamBridge, properties);
+		return new StreamBusBridge(streamBridge, properties);
 	}
 
 	@Bean
+	@ConditionalOnMissingBean
+	public RemoteApplicationEventListener busRemoteApplicationEventListener(
+			ServiceMatcher serviceMatcher, BusBridge busBridge) {
+		return new RemoteApplicationEventListener(serviceMatcher, busBridge);
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
 	public BusConsumer busConsumer(ApplicationEventPublisher applicationEventPublisher,
 			ServiceMatcher serviceMatcher, StreamBridge streamBridge,
 			BusProperties properties) {

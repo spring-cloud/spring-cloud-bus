@@ -42,12 +42,15 @@ public class BusEnvironmentPostProcessor implements EnvironmentPostProcessor {
 	@Override
 	public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
 		Map<String, Object> map = new HashMap<>();
-		//TODO: use user inports as defaults.
+		// TODO: use user inports as defaults.
 		map.put("spring.cloud.function.definition", "busConsumer");
-		map.put("spring.cloud.stream.function.bindings.busConsumer-in-0", SpringCloudBusClient.INPUT);
+		map.put("spring.cloud.stream.function.bindings.busConsumer-in-0",
+				SpringCloudBusClient.INPUT);
 		map.put("spring.cloud.stream.source", SpringCloudBusClient.DESTINATION);
-		map.put("spring.cloud.stream.bindings." + SpringCloudBusClient.INPUT + ".destination", SpringCloudBusClient.DESTINATION);
-		map.put("spring.cloud.stream.bindings." + SpringCloudBusClient.OUTPUT + ".content-type",
+		map.put("spring.cloud.stream.bindings." + SpringCloudBusClient.INPUT
+				+ ".destination", SpringCloudBusClient.DESTINATION);
+		map.put("spring.cloud.stream.bindings." + SpringCloudBusClient.OUTPUT
+				+ ".content-type",
 				environment.getProperty(PREFIX + ".content-type", "application/json"));
 		map.put("spring.cloud.bus.id", IdUtils.getUnresolvedServiceId());
 		addOrReplace(environment.getPropertySources(), map);
