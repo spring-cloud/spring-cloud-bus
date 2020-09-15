@@ -37,19 +37,17 @@ import static org.springframework.cloud.bus.BusProperties.PREFIX;
  */
 public class BusEnvironmentPostProcessor implements EnvironmentPostProcessor {
 
-	private static final String PROPERTY_SOURCE_NAME = "defaultProperties";
+	private static final String PROPERTY_SOURCE_NAME = "springCloudBusDefaultProperties";
 
 	@Override
 	public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-		Map<String, Object> map = new HashMap<String, Object>();
-		/*
-		 * spring.cloud.function.definition=<userdefined>;busConsumer
-		 * spring.cloud.stream.function.bindings.busConsumer-in-0=springCloudBusInput
-		 * spring.cloud.stream.source=springCloudBus
-		 * spring.cloud.stream.bindings.springCloudBusInput.destination=springCloudBus
-		 */
-		map.put("spring.cloud.stream.bindings." + SpringCloudBusClient.OUTPUT
-				+ ".content-type",
+		Map<String, Object> map = new HashMap<>();
+		//TODO: use user inports as defaults.
+		map.put("spring.cloud.function.definition", "busConsumer");
+		map.put("spring.cloud.stream.function.bindings.busConsumer-in-0", SpringCloudBusClient.INPUT);
+		map.put("spring.cloud.stream.source", SpringCloudBusClient.DESTINATION);
+		map.put("spring.cloud.stream.bindings." + SpringCloudBusClient.INPUT + ".destination", SpringCloudBusClient.DESTINATION);
+		map.put("spring.cloud.stream.bindings." + SpringCloudBusClient.OUTPUT + ".content-type",
 				environment.getProperty(PREFIX + ".content-type", "application/json"));
 		map.put("spring.cloud.bus.id", IdUtils.getUnresolvedServiceId());
 		addOrReplace(environment.getPropertySources(), map);
