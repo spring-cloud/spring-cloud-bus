@@ -259,9 +259,7 @@ public class BusAutoConfigurationTests {
 		when(serviceProperties.getBindings()).thenReturn(properties);
 
 		BusProperties bus = new BusProperties();
-		BusAutoConfiguration configuration = new BusAutoConfiguration(mock(ServiceMatcher.class), serviceProperties,
-				bus);
-		configuration.init();
+		BusAutoConfiguration configuration = new BusAutoConfiguration();
 		return bus;
 	}
 

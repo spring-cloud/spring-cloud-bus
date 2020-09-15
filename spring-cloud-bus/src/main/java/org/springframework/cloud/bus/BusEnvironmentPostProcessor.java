@@ -27,6 +27,8 @@ import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertySource;
 
+import static org.springframework.cloud.bus.BusProperties.PREFIX;
+
 /**
  * {@link EnvironmentPostProcessor} that sets the default properties for the Bus.
  *
@@ -40,8 +42,15 @@ public class BusEnvironmentPostProcessor implements EnvironmentPostProcessor {
 	@Override
 	public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
 		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("spring.cloud.stream.bindings." + SpringCloudBusClient.OUTPUT + ".content-type",
-				environment.getProperty("spring.cloud.bus.content-type", "application/json"));
+		/*
+		 * spring.cloud.function.definition=<userdefined>;busConsumer
+		 * spring.cloud.stream.function.bindings.busConsumer-in-0=springCloudBusInput
+		 * spring.cloud.stream.source=springCloudBus
+		 * spring.cloud.stream.bindings.springCloudBusInput.destination=springCloudBus
+		 */
+		map.put("spring.cloud.stream.bindings." + SpringCloudBusClient.OUTPUT
+				+ ".content-type",
+				environment.getProperty(PREFIX + ".content-type", "application/json"));
 		map.put("spring.cloud.bus.id", IdUtils.getUnresolvedServiceId());
 		addOrReplace(environment.getPropertySources(), map);
 	}
