@@ -42,7 +42,7 @@ public class BusEnvironmentPostProcessor implements EnvironmentPostProcessor {
 	@Override
 	public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
 		Map<String, Object> map = new HashMap<>();
-		// TODO: use user inports as defaults.
+		// TODO: use user imports as defaults.
 		map.put("spring.cloud.function.definition", "busConsumer");
 		map.put("spring.cloud.stream.function.bindings.busConsumer-in-0", SpringCloudBusClient.INPUT);
 		map.put("spring.cloud.stream.source", SpringCloudBusClient.DESTINATION);
