@@ -33,8 +33,7 @@ public class StreamBusBridge {
 
 	public void send(RemoteApplicationEvent event) {
 		// TODO: configurable mimetype?
-		this.streamBridge.send(properties.getDestination(),
-				MessageBuilder.withPayload(event).build());
+		this.streamBridge.send(properties.getDestination(), MessageBuilder.withPayload(event).build());
 	}
 
 }

@@ -23,8 +23,7 @@ import org.springframework.cloud.bus.event.AckRemoteApplicationEvent;
 import org.springframework.cloud.bus.event.RemoteApplicationEvent;
 import org.springframework.context.ApplicationListener;
 
-public class RemoteApplicationEventListener
-		implements ApplicationListener<RemoteApplicationEvent> {
+public class RemoteApplicationEventListener implements ApplicationListener<RemoteApplicationEvent> {
 
 	private final Log log = LogFactory.getLog(getClass());
 
@@ -32,16 +31,14 @@ public class RemoteApplicationEventListener
 
 	private final BusBridge busBridge;
 
-	public RemoteApplicationEventListener(ServiceMatcher serviceMatcher,
-			BusBridge busBridge) {
+	public RemoteApplicationEventListener(ServiceMatcher serviceMatcher, BusBridge busBridge) {
 		this.serviceMatcher = serviceMatcher;
 		this.busBridge = busBridge;
 	}
 
 	@Override
 	public void onApplicationEvent(RemoteApplicationEvent event) {
-		if (this.serviceMatcher.isFromSelf(event)
-				&& !(event instanceof AckRemoteApplicationEvent)) {
+		if (this.serviceMatcher.isFromSelf(event) && !(event instanceof AckRemoteApplicationEvent)) {
 			if (log.isDebugEnabled()) {
 				log.debug("Sending remote event on bus: " + event);
 			}

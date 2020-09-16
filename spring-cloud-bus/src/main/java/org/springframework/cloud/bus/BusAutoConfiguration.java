@@ -53,25 +53,22 @@ public class BusAutoConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean(BusBridge.class)
-	public StreamBusBridge streamBusBridge(StreamBridge streamBridge,
-			BusProperties properties) {
+	public StreamBusBridge streamBusBridge(StreamBridge streamBridge, BusProperties properties) {
 		return new StreamBusBridge(streamBridge, properties);
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
-	public RemoteApplicationEventListener busRemoteApplicationEventListener(
-			ServiceMatcher serviceMatcher, BusBridge busBridge) {
+	public RemoteApplicationEventListener busRemoteApplicationEventListener(ServiceMatcher serviceMatcher,
+			BusBridge busBridge) {
 		return new RemoteApplicationEventListener(serviceMatcher, busBridge);
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
-	public BusConsumer busConsumer(ApplicationEventPublisher applicationEventPublisher,
-			ServiceMatcher serviceMatcher, StreamBridge streamBridge,
-			BusProperties properties) {
-		return new BusConsumer(applicationEventPublisher, serviceMatcher, streamBridge,
-				properties);
+	public BusConsumer busConsumer(ApplicationEventPublisher applicationEventPublisher, ServiceMatcher serviceMatcher,
+			StreamBridge streamBridge, BusProperties properties) {
+		return new BusConsumer(applicationEventPublisher, serviceMatcher, streamBridge, properties);
 	}
 
 	@Configuration(proxyBeanMethods = false)

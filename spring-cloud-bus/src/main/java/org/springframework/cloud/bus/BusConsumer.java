@@ -40,8 +40,8 @@ public class BusConsumer implements Consumer<RemoteApplicationEvent> {
 
 	private final BusProperties properties;
 
-	public BusConsumer(ApplicationEventPublisher publisher, ServiceMatcher serviceMatcher,
-			StreamBridge streamBridge, BusProperties properties) {
+	public BusConsumer(ApplicationEventPublisher publisher, ServiceMatcher serviceMatcher, StreamBridge streamBridge,
+			BusProperties properties) {
 		this.publisher = publisher;
 		this.serviceMatcher = serviceMatcher;
 		this.streamBridge = streamBridge;
@@ -51,8 +51,8 @@ public class BusConsumer implements Consumer<RemoteApplicationEvent> {
 	@Override
 	public void accept(RemoteApplicationEvent event) {
 		if (event instanceof AckRemoteApplicationEvent) {
-			if (this.properties.getTrace().isEnabled()
-					&& !this.serviceMatcher.isFromSelf(event) && this.publisher != null) {
+			if (this.properties.getTrace().isEnabled() && !this.serviceMatcher.isFromSelf(event)
+					&& this.publisher != null) {
 				this.publisher.publishEvent(event);
 			}
 			// If it's an ACK we are finished processing at this point
@@ -68,21 +68,18 @@ public class BusConsumer implements Consumer<RemoteApplicationEvent> {
 				this.publisher.publishEvent(event);
 			}
 			if (this.properties.getAck().isEnabled()) {
-				AckRemoteApplicationEvent ack = new AckRemoteApplicationEvent(this,
-						this.serviceMatcher.getServiceId(),
-						this.properties.getAck().getDestinationService(),
-						event.getDestinationService(), event.getId(), event.getClass());
-				this.streamBridge.send(properties.getDestination(),
-						MessageBuilder.withPayload(ack).build());
+				AckRemoteApplicationEvent ack = new AckRemoteApplicationEvent(this, this.serviceMatcher.getServiceId(),
+						this.properties.getAck().getDestinationService(), event.getDestinationService(), event.getId(),
+						event.getClass());
+				this.streamBridge.send(properties.getDestination(), MessageBuilder.withPayload(ack).build());
 				this.publisher.publishEvent(ack);
 			}
 		}
 		if (this.properties.getTrace().isEnabled() && this.publisher != null) {
 			// We are set to register sent events so publish it for local consumption,
 			// irrespective of the origin
-			this.publisher.publishEvent(new SentApplicationEvent(this,
-					event.getOriginService(), event.getDestinationService(),
-					event.getId(), event.getClass()));
+			this.publisher.publishEvent(new SentApplicationEvent(this, event.getOriginService(),
+					event.getDestinationService(), event.getId(), event.getClass()));
 		}
 	}
 
