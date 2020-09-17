@@ -20,7 +20,7 @@ package org.springframework.cloud.bus;
  * @author Dave Syer
  *
  */
-abstract class SpringCloudBusClient {
+abstract class BusConstants {
 
 	/**
 	 * Name of the input channel for Spring Cloud Bus.
@@ -36,5 +36,10 @@ abstract class SpringCloudBusClient {
 	 * Name of the output channel for Spring Cloud Bus.
 	 */
 	public static final String DESTINATION = "springCloudBus";
+
+	/**
+	 * Name of the Spring Cloud Bus function.
+	 */
+	public static final String BUS_CONSUMER = "busConsumer";
 
 }

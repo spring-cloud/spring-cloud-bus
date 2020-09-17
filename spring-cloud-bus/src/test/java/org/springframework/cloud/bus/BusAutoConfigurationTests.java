@@ -78,7 +78,7 @@ public class BusAutoConfigurationTests {
 	public void inboundNotForSelf() {
 		this.context = SpringApplication.run(InboundMessageHandlerConfiguration.class, "--spring.cloud.bus.id=foo",
 				"--server.port=0");
-		this.context.getBean(SpringCloudBusClient.INPUT, MessageChannel.class)
+		this.context.getBean(BusConstants.INPUT, MessageChannel.class)
 				.send(new GenericMessage<>(new RefreshRemoteApplicationEvent(this, "bar", "bar")));
 		assertThat(this.context.getBean(InboundMessageHandlerConfiguration.class).refresh).isNull();
 	}
@@ -87,7 +87,7 @@ public class BusAutoConfigurationTests {
 	public void inboundFromSelf() {
 		this.context = SpringApplication.run(InboundMessageHandlerConfiguration.class, "--spring.cloud.bus.id=foo",
 				"--server.port=0");
-		this.context.getBean(SpringCloudBusClient.INPUT, MessageChannel.class)
+		this.context.getBean(BusConstants.INPUT, MessageChannel.class)
 				.send(new GenericMessage<>(new RefreshRemoteApplicationEvent(this, "foo", null)));
 		assertThat(this.context.getBean(InboundMessageHandlerConfiguration.class).refresh).isNull();
 	}
@@ -96,7 +96,7 @@ public class BusAutoConfigurationTests {
 	public void inboundNotFromSelf() {
 		this.context = SpringApplication.run(InboundMessageHandlerConfiguration.class, "--spring.cloud.bus.id=bar",
 				"--server.port=0");
-		this.context.getBean(SpringCloudBusClient.INPUT, MessageChannel.class)
+		this.context.getBean(BusConstants.INPUT, MessageChannel.class)
 				.send(new GenericMessage<>(new RefreshRemoteApplicationEvent(this, "foo", null)));
 		assertThat(this.context.getBean(InboundMessageHandlerConfiguration.class).refresh).isNotNull();
 	}
@@ -107,7 +107,7 @@ public class BusAutoConfigurationTests {
 				new Class[] { InboundMessageHandlerConfiguration.class, OutboundMessageHandlerConfiguration.class,
 						SentMessageConfiguration.class },
 				new String[] { "--spring.cloud.bus.id=bar", "--server.port=0" });
-		this.context.getBean(SpringCloudBusClient.INPUT, MessageChannel.class)
+		this.context.getBean(BusConstants.INPUT, MessageChannel.class)
 				.send(new GenericMessage<>(new RefreshRemoteApplicationEvent(this, "foo", null)));
 		RefreshRemoteApplicationEvent refresh = this.context.getBean(InboundMessageHandlerConfiguration.class).refresh;
 		assertThat(refresh).isNotNull();
@@ -124,7 +124,7 @@ public class BusAutoConfigurationTests {
 						SentMessageConfiguration.class },
 				new String[] { "--spring.cloud.bus.trace.enabled=true", "--spring.cloud.bus.id=bar",
 						"--server.port=0" });
-		this.context.getBean(SpringCloudBusClient.INPUT, MessageChannel.class)
+		this.context.getBean(BusConstants.INPUT, MessageChannel.class)
 				.send(new GenericMessage<>(new RefreshRemoteApplicationEvent(this, "foo", null)));
 		RefreshRemoteApplicationEvent refresh = this.context.getBean(InboundMessageHandlerConfiguration.class).refresh;
 		assertThat(refresh).isNotNull();
@@ -141,7 +141,7 @@ public class BusAutoConfigurationTests {
 				new String[] { "--spring.cloud.bus.trace.enabled=true", "--spring.cloud.bus.id=bar",
 						"--server.port=0" });
 		this.context.getBean(BusProperties.class).setId("bar");
-		this.context.getBean(SpringCloudBusClient.INPUT, MessageChannel.class).send(new GenericMessage<>(
+		this.context.getBean(BusConstants.INPUT, MessageChannel.class).send(new GenericMessage<>(
 				new AckRemoteApplicationEvent(this, "foo", null, "ID", "bar", RefreshRemoteApplicationEvent.class)));
 		AckMessageConfiguration sent = this.context.getBean(AckMessageConfiguration.class);
 		assertThat(sent.event).isNotNull();
@@ -170,7 +170,7 @@ public class BusAutoConfigurationTests {
 	public void inboundNotFromSelfPathPattern() {
 		this.context = SpringApplication.run(InboundMessageHandlerConfiguration.class, "--spring.cloud.bus.id=bar:1000",
 				"--server.port=0");
-		this.context.getBean(SpringCloudBusClient.INPUT, MessageChannel.class)
+		this.context.getBean(BusConstants.INPUT, MessageChannel.class)
 				.send(new GenericMessage<>(new RefreshRemoteApplicationEvent(this, "foo", "bar:*")));
 		assertThat(this.context.getBean(InboundMessageHandlerConfiguration.class).refresh).isNotNull();
 	}
@@ -179,7 +179,7 @@ public class BusAutoConfigurationTests {
 	public void inboundNotFromSelfDeepPathPattern() {
 		this.context = SpringApplication.run(InboundMessageHandlerConfiguration.class,
 				"--spring.cloud.bus.id=bar:test:1000", "--server.port=0");
-		this.context.getBean(SpringCloudBusClient.INPUT, MessageChannel.class)
+		this.context.getBean(BusConstants.INPUT, MessageChannel.class)
 				.send(new GenericMessage<>(new RefreshRemoteApplicationEvent(this, "foo", "bar:**")));
 		assertThat(this.context.getBean(InboundMessageHandlerConfiguration.class).refresh).isNotNull();
 	}
@@ -188,7 +188,7 @@ public class BusAutoConfigurationTests {
 	public void inboundNotFromSelfFlatPattern() {
 		this.context = SpringApplication.run(InboundMessageHandlerConfiguration.class, "--spring.cloud.bus.id=bar",
 				"--server.port=0");
-		this.context.getBean(SpringCloudBusClient.INPUT, MessageChannel.class)
+		this.context.getBean(BusConstants.INPUT, MessageChannel.class)
 				.send(new GenericMessage<>(new RefreshRemoteApplicationEvent(this, "foo", "bar*")));
 		assertThat(this.context.getBean(InboundMessageHandlerConfiguration.class).refresh).isNotNull();
 	}
@@ -198,7 +198,7 @@ public class BusAutoConfigurationTests {
 	public void inboundNotFromSelfUnknown() {
 		this.context = SpringApplication.run(InboundMessageHandlerConfiguration.class, "--spring.cloud.bus.id=bar",
 				"--server.port=0");
-		this.context.getBean(SpringCloudBusClient.INPUT, MessageChannel.class)
+		this.context.getBean(BusConstants.INPUT, MessageChannel.class)
 				.send(new GenericMessage<>(new UnknownRemoteApplicationEvent(this, "UnknownEvent", "yada".getBytes())));
 		// No Exception expected
 	}
@@ -206,8 +206,8 @@ public class BusAutoConfigurationTests {
 	@Test
 	public void initSetsBindingDestinationIfNullDefault() {
 		HashMap<String, BindingProperties> properties = new HashMap<>();
-		properties.put(SpringCloudBusClient.INPUT, new BindingProperties());
-		properties.put(SpringCloudBusClient.OUTPUT, new BindingProperties());
+		properties.put(BusConstants.INPUT, new BindingProperties());
+		properties.put(BusConstants.OUTPUT, new BindingProperties());
 
 		testDestinations(properties);
 	}
@@ -216,11 +216,11 @@ public class BusAutoConfigurationTests {
 	public void initSetsBindingDestinationIfNotNullDefault() {
 		HashMap<String, BindingProperties> properties = new HashMap<>();
 		BindingProperties input = new BindingProperties();
-		input.setDestination(SpringCloudBusClient.INPUT);
-		properties.put(SpringCloudBusClient.INPUT, input);
+		input.setDestination(BusConstants.INPUT);
+		properties.put(BusConstants.INPUT, input);
 		BindingProperties output = new BindingProperties();
-		output.setDestination(SpringCloudBusClient.OUTPUT);
-		properties.put(SpringCloudBusClient.OUTPUT, output);
+		output.setDestination(BusConstants.OUTPUT);
+		properties.put(BusConstants.OUTPUT, output);
 
 		testDestinations(properties);
 	}
@@ -230,27 +230,27 @@ public class BusAutoConfigurationTests {
 		HashMap<String, BindingProperties> properties = new HashMap<>();
 		BindingProperties input = new BindingProperties();
 		input.setDestination("mydestination");
-		properties.put(SpringCloudBusClient.INPUT, input);
+		properties.put(BusConstants.INPUT, input);
 		BindingProperties output = new BindingProperties();
 		output.setDestination("mydestination");
-		properties.put(SpringCloudBusClient.OUTPUT, output);
+		properties.put(BusConstants.OUTPUT, output);
 
 		setupBusAutoConfig(properties);
 
-		BindingProperties inputProps = properties.get(SpringCloudBusClient.INPUT);
+		BindingProperties inputProps = properties.get(BusConstants.INPUT);
 		assertThat(inputProps.getDestination()).isEqualTo("mydestination");
 
-		BindingProperties outputProps = properties.get(SpringCloudBusClient.OUTPUT);
+		BindingProperties outputProps = properties.get(BusConstants.OUTPUT);
 		assertThat(outputProps.getDestination()).isEqualTo("mydestination");
 	}
 
 	private void testDestinations(HashMap<String, BindingProperties> properties) {
 		BusProperties bus = setupBusAutoConfig(properties);
 
-		BindingProperties input = properties.get(SpringCloudBusClient.INPUT);
+		BindingProperties input = properties.get(BusConstants.INPUT);
 		assertThat(input.getDestination()).isEqualTo(bus.getDestination());
 
-		BindingProperties output = properties.get(SpringCloudBusClient.OUTPUT);
+		BindingProperties output = properties.get(BusConstants.OUTPUT);
 		assertThat(output.getDestination()).isEqualTo(bus.getDestination());
 	}
 
@@ -288,7 +288,7 @@ public class BusAutoConfigurationTests {
 	protected static class OutboundMessageHandlerConfiguration {
 
 		@Autowired
-		@Output(SpringCloudBusClient.OUTPUT)
+		@Output(BusConstants.OUTPUT)
 		private MessageChannel cloudBusOutboundChannel;
 
 		private CountDownLatch latch = new CountDownLatch(1);
@@ -316,7 +316,7 @@ public class BusAutoConfigurationTests {
 	@MessageEndpoint
 	protected static class MessageConsumer {
 
-		@ServiceActivator(inputChannel = SpringCloudBusClient.OUTPUT)
+		@ServiceActivator(inputChannel = BusConstants.OUTPUT)
 		public void handle(Message<?> msg) {
 		}
 

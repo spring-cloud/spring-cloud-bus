@@ -38,6 +38,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import static org.springframework.cloud.bus.BusConstants.BUS_CONSUMER;
+
 /**
  * @author Spencer Gibb
  * @author Dave Syer
@@ -65,7 +67,7 @@ public class BusAutoConfiguration {
 	}
 
 	@Bean
-	@ConditionalOnMissingBean
+	@ConditionalOnMissingBean(name = BUS_CONSUMER)
 	public BusConsumer busConsumer(ApplicationEventPublisher applicationEventPublisher, ServiceMatcher serviceMatcher,
 			StreamBridge streamBridge, BusProperties properties) {
 		return new BusConsumer(applicationEventPublisher, serviceMatcher, streamBridge, properties);
@@ -74,7 +76,7 @@ public class BusAutoConfiguration {
 	@Configuration(proxyBeanMethods = false)
 	@ConditionalOnClass({ Endpoint.class })
 	@ConditionalOnBean(HttpTraceRepository.class)
-	@ConditionalOnProperty("spring.cloud.bus.trace.enabled")
+	@ConditionalOnProperty(BusProperties.PREFIX + ".trace.enabled")
 	protected static class BusAckTraceConfiguration {
 
 		@Bean
