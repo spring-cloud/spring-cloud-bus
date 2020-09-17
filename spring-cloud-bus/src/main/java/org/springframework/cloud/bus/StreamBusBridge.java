@@ -20,7 +20,7 @@ import org.springframework.cloud.bus.event.RemoteApplicationEvent;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.messaging.support.MessageBuilder;
 
-public class StreamBusBridge {
+public class StreamBusBridge implements BusBridge {
 
 	private final StreamBridge streamBridge;
 
