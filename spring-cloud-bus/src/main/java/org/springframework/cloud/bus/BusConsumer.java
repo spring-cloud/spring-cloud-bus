@@ -24,9 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.cloud.bus.event.AckRemoteApplicationEvent;
 import org.springframework.cloud.bus.event.RemoteApplicationEvent;
 import org.springframework.cloud.bus.event.SentApplicationEvent;
-import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.messaging.support.MessageBuilder;
 
 public class BusConsumer implements Consumer<RemoteApplicationEvent> {
 
@@ -36,15 +34,15 @@ public class BusConsumer implements Consumer<RemoteApplicationEvent> {
 
 	private final ServiceMatcher serviceMatcher;
 
-	private final StreamBridge streamBridge;
+	private final BusBridge busBridge;
 
 	private final BusProperties properties;
 
-	public BusConsumer(ApplicationEventPublisher publisher, ServiceMatcher serviceMatcher, StreamBridge streamBridge,
+	public BusConsumer(ApplicationEventPublisher publisher, ServiceMatcher serviceMatcher, BusBridge busBridge,
 			BusProperties properties) {
 		this.publisher = publisher;
 		this.serviceMatcher = serviceMatcher;
-		this.streamBridge = streamBridge;
+		this.busBridge = busBridge;
 		this.properties = properties;
 	}
 
@@ -71,7 +69,7 @@ public class BusConsumer implements Consumer<RemoteApplicationEvent> {
 				AckRemoteApplicationEvent ack = new AckRemoteApplicationEvent(this, this.serviceMatcher.getServiceId(),
 						this.properties.getAck().getDestinationService(), event.getDestinationService(), event.getId(),
 						event.getClass());
-				this.streamBridge.send(properties.getDestination(), MessageBuilder.withPayload(ack).build());
+				this.busBridge.send(ack);
 				this.publisher.publishEvent(ack);
 			}
 		}

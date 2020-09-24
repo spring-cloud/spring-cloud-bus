@@ -69,8 +69,8 @@ public class BusAutoConfiguration {
 	@Bean
 	@ConditionalOnMissingBean(name = BUS_CONSUMER)
 	public BusConsumer busConsumer(ApplicationEventPublisher applicationEventPublisher, ServiceMatcher serviceMatcher,
-			StreamBridge streamBridge, BusProperties properties) {
-		return new BusConsumer(applicationEventPublisher, serviceMatcher, streamBridge, properties);
+			BusBridge busBridge, BusProperties properties) {
+		return new BusConsumer(applicationEventPublisher, serviceMatcher, busBridge, properties);
 	}
 
 	@Configuration(proxyBeanMethods = false)
