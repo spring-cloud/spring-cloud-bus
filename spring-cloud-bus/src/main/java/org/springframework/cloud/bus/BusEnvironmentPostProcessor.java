@@ -22,6 +22,7 @@ import java.util.Map;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.cloud.commons.util.IdUtils;
+import org.springframework.cloud.function.context.FunctionProperties;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.MutablePropertySources;
@@ -37,31 +38,43 @@ import static org.springframework.cloud.bus.BusProperties.PREFIX;
  */
 public class BusEnvironmentPostProcessor implements EnvironmentPostProcessor {
 
-	private static final String PROPERTY_SOURCE_NAME = "springCloudBusDefaultProperties";
+	private static final String DEFAULTS_PROPERTY_SOURCE_NAME = "springCloudBusDefaultProperties";
 
-	private static final String FN_DEF_PROP = "spring.cloud.function.definition";
+	private static final String OVERRIDES_PROPERTY_SOURCE_NAME = "springCloudBusOverridesProperties";
+
+	private static final String FN_DEF_PROP = FunctionProperties.PREFIX + ".definition";
 
 	@Override
 	public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-		Map<String, Object> map = new HashMap<>();
+		Map<String, Object> overrides = new HashMap<>();
 		String definition = BusConstants.BUS_CONSUMER;
 		if (environment.containsProperty(FN_DEF_PROP)) {
-			definition = environment.getProperty(FN_DEF_PROP) + ";" + definition;
+			String property = environment.getProperty(FN_DEF_PROP);
+			if (property != null && property.contains(BusConstants.BUS_CONSUMER)) {
+				// in the case that EnvironmentPostProcessor are run more than once.
+				return;
+			}
+			definition = property + ";" + definition;
 		}
-		map.put(FN_DEF_PROP, definition);
-		map.put("spring.cloud.stream.function.bindings." + BusConstants.BUS_CONSUMER + "-in-0", BusConstants.INPUT);
-		map.put("spring.cloud.stream.source", BusConstants.DESTINATION);
-		map.put("spring.cloud.stream.bindings." + BusConstants.INPUT + ".destination", BusConstants.DESTINATION);
-		map.put("spring.cloud.stream.bindings." + BusConstants.OUTPUT + ".content-type",
-				environment.getProperty(PREFIX + ".content-type", "application/json"));
-		map.put(PREFIX + ".id", IdUtils.getUnresolvedServiceId());
-		addOrReplace(environment.getPropertySources(), map);
+		overrides.put(FN_DEF_PROP, definition);
+		addOrReplace(environment.getPropertySources(), overrides, OVERRIDES_PROPERTY_SOURCE_NAME, true);
+
+		Map<String, Object> defaults = new HashMap<>();
+		defaults.put("spring.cloud.stream.function.bindings." + BusConstants.BUS_CONSUMER + "-in-0",
+				BusConstants.INPUT);
+		String destination = environment.getProperty(PREFIX + ".destination", BusConstants.DESTINATION);
+		defaults.put("spring.cloud.stream.bindings." + BusConstants.INPUT + ".destination", destination);
+		if (!environment.containsProperty(PREFIX + ".id")) {
+			defaults.put(PREFIX + ".id", IdUtils.getUnresolvedServiceId());
+		}
+		addOrReplace(environment.getPropertySources(), defaults, DEFAULTS_PROPERTY_SOURCE_NAME, false);
 	}
 
-	private void addOrReplace(MutablePropertySources propertySources, Map<String, Object> map) {
+	private void addOrReplace(MutablePropertySources propertySources, Map<String, Object> map,
+			String propertySourceName, boolean first) {
 		MapPropertySource target = null;
-		if (propertySources.contains(PROPERTY_SOURCE_NAME)) {
-			PropertySource<?> source = propertySources.get(PROPERTY_SOURCE_NAME);
+		if (propertySources.contains(propertySourceName)) {
+			PropertySource<?> source = propertySources.get(propertySourceName);
 			if (source instanceof MapPropertySource) {
 				target = (MapPropertySource) source;
 				for (String key : map.keySet()) {
@@ -72,10 +85,15 @@ public class BusEnvironmentPostProcessor implements EnvironmentPostProcessor {
 			}
 		}
 		if (target == null) {
-			target = new MapPropertySource(PROPERTY_SOURCE_NAME, map);
+			target = new MapPropertySource(propertySourceName, map);
 		}
-		if (!propertySources.contains(PROPERTY_SOURCE_NAME)) {
-			propertySources.addLast(target);
+		if (!propertySources.contains(propertySourceName)) {
+			if (first) {
+				propertySources.addFirst(target);
+			}
+			else {
+				propertySources.addLast(target);
+			}
 		}
 	}
 

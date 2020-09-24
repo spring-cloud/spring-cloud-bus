@@ -46,7 +46,7 @@ public class BusProperties {
 	/**
 	 * Name of Spring Cloud Stream destination for messages.
 	 */
-	private String destination = "springCloudBus";
+	private String destination = BusConstants.DESTINATION;
 
 	/**
 	 * The identifier for this application instance.
