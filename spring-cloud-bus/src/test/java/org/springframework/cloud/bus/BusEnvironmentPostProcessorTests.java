@@ -16,22 +16,49 @@
 
 package org.springframework.cloud.bus;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.fail;
+import org.springframework.boot.SpringApplication;
+import org.springframework.cloud.function.context.FunctionProperties;
+import org.springframework.mock.env.MockEnvironment;
 
-@Disabled
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.springframework.cloud.bus.BusConstants.BUS_CONSUMER;
+import static org.springframework.cloud.bus.BusConstants.DESTINATION;
+import static org.springframework.cloud.bus.BusConstants.INPUT;
+import static org.springframework.cloud.bus.BusEnvironmentPostProcessor.DEFAULTS_PROPERTY_SOURCE_NAME;
+import static org.springframework.cloud.bus.BusEnvironmentPostProcessor.OVERRIDES_PROPERTY_SOURCE_NAME;
+
 public class BusEnvironmentPostProcessorTests {
 
 	@Test
 	void testDefaults() {
-		fail("not implemented test");
+		MockEnvironment env = new MockEnvironment().withProperty("cachedrandom.application.value", "123");
+		new BusEnvironmentPostProcessor().postProcessEnvironment(env, mock(SpringApplication.class));
+		assertThat(env.getProperty(FunctionProperties.PREFIX + ".definition")).isEqualTo(BUS_CONSUMER);
+		assertThat(env.getProperty("spring.cloud.stream.function.bindings." + BUS_CONSUMER + "-in-0")).isEqualTo(INPUT);
+		assertThat(env.getProperty("spring.cloud.stream.bindings." + INPUT + ".destination")).isEqualTo(DESTINATION);
+		assertThat(env.getProperty(BusProperties.PREFIX + ".id")).isNotBlank();
+		assertThat(env.getPropertySources().contains(OVERRIDES_PROPERTY_SOURCE_NAME));
+		assertThat(env.getPropertySources().contains(DEFAULTS_PROPERTY_SOURCE_NAME));
 	}
 
 	@Test
 	void testOverrides() {
-		fail("not implemented test");
+		String fnDefKey = FunctionProperties.PREFIX + ".definition";
+		String idKey = BusProperties.PREFIX + ".id";
+		MockEnvironment env = new MockEnvironment().withProperty("cachedrandom.application.value", "123")
+				.withProperty(BusProperties.PREFIX + ".destination", "mydestination").withProperty(idKey, "app:1")
+				.withProperty(fnDefKey, "uppercase");
+		new BusEnvironmentPostProcessor().postProcessEnvironment(env, mock(SpringApplication.class));
+		assertThat(env.getProperty(fnDefKey)).isEqualTo("uppercase;" + BUS_CONSUMER);
+		assertThat(env.getProperty("spring.cloud.stream.function.bindings." + BUS_CONSUMER + "-in-0")).isEqualTo(INPUT);
+		assertThat(env.getProperty("spring.cloud.stream.bindings." + INPUT + ".destination"))
+				.isEqualTo("mydestination");
+		assertThat(env.getProperty(idKey)).isEqualTo("app:1");
+		assertThat(env.getPropertySources().contains(OVERRIDES_PROPERTY_SOURCE_NAME));
+		assertThat(env.getPropertySources().contains(DEFAULTS_PROPERTY_SOURCE_NAME));
 	}
 
 }

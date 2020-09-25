@@ -38,9 +38,9 @@ import static org.springframework.cloud.bus.BusProperties.PREFIX;
  */
 public class BusEnvironmentPostProcessor implements EnvironmentPostProcessor {
 
-	private static final String DEFAULTS_PROPERTY_SOURCE_NAME = "springCloudBusDefaultProperties";
+	static final String DEFAULTS_PROPERTY_SOURCE_NAME = "springCloudBusDefaultProperties";
 
-	private static final String OVERRIDES_PROPERTY_SOURCE_NAME = "springCloudBusOverridesProperties";
+	static final String OVERRIDES_PROPERTY_SOURCE_NAME = "springCloudBusOverridesProperties";
 
 	private static final String FN_DEF_PROP = FunctionProperties.PREFIX + ".definition";
 
