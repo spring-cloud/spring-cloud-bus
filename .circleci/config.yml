@@ -12,11 +12,6 @@ jobs:
         - gh-pages # list of branches to ignore
     steps:
       - checkout
-      - restore_cache:
-          key: sc-bus-{{ .Environment.CACHE_VERSION }}-{{ .Branch }}
-      - run:
-          name: "Download dependencies"
-          command: ./mvnw -s .settings.xml -U --fail-never dependency:go-offline || true
       - run:
           name: "Install rootless Docker"
           command: |
@@ -27,6 +22,11 @@ jobs:
             PATH=$HOME/bin:$PATH dockerd-rootless.sh --experimental --storage-driver vfs &
             sleep 1
             DOCKER_HOST=unix://$XDG_RUNTIME_DIR/docker.sock docker info || ls -la $XDG_RUNTIME_DIR
+      - restore_cache:
+          key: sc-bus-{{ .Environment.CACHE_VERSION }}-{{ .Branch }}
+      - run:
+          name: "Download dependencies"
+          command: ./mvnw -s .settings.xml -U --fail-never dependency:go-offline || true
       - save_cache:
           key: sc-bus-{{ .Environment.CACHE_VERSION }}-{{ .Branch }}
           paths:
