@@ -35,6 +35,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.bus.event.EnvironmentChangeRemoteApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -51,9 +53,17 @@ public class BusAmqpIntegrationTests {
 
 	private static ConfigurableApplicationContext context;
 
+	@DynamicPropertySource
+	static void properties(DynamicPropertyRegistry registry) {
+		registry.add("spring.rabbitmq.host", rabbitMQContainer::getHost);
+		registry.add("spring.rabbitmq.port", rabbitMQContainer::getAmqpPort);
+	}
+
 	@BeforeAll
 	static void before() {
 		context = new SpringApplicationBuilder(TestConfig.class).properties("server.port=0",
+				"spring.rabbitmq.host=" + rabbitMQContainer.getHost(),
+				"spring.rabbitmq.port=" + rabbitMQContainer.getAmqpPort(),
 				"management.endpoints.web.exposure.include=*", "spring.cloud.bus.id=app:2",
 				"spring.autoconfigure.exclude=org.springframework.cloud.stream.test.binder.TestSupportBinderAutoConfiguration")
 				.run();
