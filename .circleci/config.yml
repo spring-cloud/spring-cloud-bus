@@ -1,27 +1,17 @@
 version: 2
 jobs:
   build:
-    docker:
-      - image: cimg/openjdk:8.0
+    machine:
+      image: ubuntu-1604:202007-01
     environment:
       _JAVA_OPTIONS: "-Xms1024m -Xmx2048m"
       TERM: dumb
-      CACHE_VERSION: 1
+      CACHE_VERSION: 2
     branches:
       ignore:
         - gh-pages # list of branches to ignore
     steps:
       - checkout
-      - run:
-          name: "Install rootless Docker"
-          command: |
-            echo XDG_RUNTIME_DIR $XDG_RUNTIME_DIR
-            curl -fsSL https://get.docker.com/rootless | sh > init.sh
-            cat init.sh
-            source <(grep '^export' init.sh)
-            PATH=$HOME/bin:$PATH dockerd-rootless.sh --experimental --storage-driver vfs &
-            sleep 1
-            DOCKER_HOST=unix://$XDG_RUNTIME_DIR/docker.sock docker info || ls -la $XDG_RUNTIME_DIR
       - restore_cache:
           key: sc-bus-{{ .Environment.CACHE_VERSION }}-{{ .Branch }}
       - run:
