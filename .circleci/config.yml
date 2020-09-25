@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: springcloud/pipeline-base
+      - image: cimg/openjdk:8.0
         user: appuser
     environment:
       _JAVA_OPTIONS: "-Xms1024m -Xmx2048m"
