@@ -6,13 +6,14 @@ jobs:
     environment:
       _JAVA_OPTIONS: "-Xms1024m -Xmx2048m"
       TERM: dumb
+      CACHE_VERSION: 1
     branches:
       ignore:
         - gh-pages # list of branches to ignore
     steps:
       - checkout
       - restore_cache:
-          key: sc-bus-{{ .Branch }}
+          key: sc-bus-{{ .Environment.CACHE_VERSION }}-{{ .Branch }}
       - run:
           name: "Download dependencies"
           command: ./mvnw -s .settings.xml -U --fail-never dependency:go-offline || true
@@ -27,7 +28,7 @@ jobs:
             sleep 1
             DOCKER_HOST=unix://$XDG_RUNTIME_DIR/docker.sock docker info || ls -la $XDG_RUNTIME_DIR
       - save_cache:
-          key: sc-bus-{{ .Branch }}
+          key: sc-bus-{{ .Environment.CACHE_VERSION }}-{{ .Branch }}
           paths:
             - ~/.m2
       - run:
