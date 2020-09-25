@@ -21,7 +21,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.springframework.boot.SpringApplication;
@@ -114,14 +113,13 @@ public class BusAutoConfigurationTests {
 	}
 
 	@Test
-	@Ignore
 	public void inboundNotFromSelfWithTrace() {
 		this.context = SpringApplication.run(
 				new Class[] { InboundMessageHandlerConfiguration.class, OutboundMessageHandlerConfiguration.class,
 						SentMessageConfiguration.class },
 				new String[] { "--spring.cloud.bus.trace.enabled=true", "--spring.cloud.bus.id=bar",
 						"--server.port=0" });
-		this.context.getBean(BusBridge.class).send(new RefreshRemoteApplicationEvent(this, "foo", null));
+		this.context.getBean(BusConsumer.class).accept(new RefreshRemoteApplicationEvent(this, "foo", null));
 		RefreshRemoteApplicationEvent refresh = this.context.getBean(InboundMessageHandlerConfiguration.class).refresh;
 		assertThat(refresh).isNotNull();
 		SentMessageConfiguration sent = this.context.getBean(SentMessageConfiguration.class);
@@ -130,19 +128,18 @@ public class BusAutoConfigurationTests {
 	}
 
 	@Test
-	@Ignore
 	public void inboundAckWithTrace() throws InterruptedException {
 		this.context = SpringApplication.run(
 				new Class[] { InboundMessageHandlerConfiguration.class, OutboundMessageHandlerConfiguration.class,
 						AckMessageConfiguration.class },
 				new String[] { "--spring.cloud.bus.trace.enabled=true", "--spring.cloud.bus.id=bar",
 						"--server.port=0" });
-		this.context.getBean(BusBridge.class).send(
+		this.context.getBean(BusConsumer.class).accept(
 				new AckRemoteApplicationEvent(this, "foo", null, "ID", "bar", RefreshRemoteApplicationEvent.class));
-		AckMessageConfiguration sent = this.context.getBean(AckMessageConfiguration.class);
-		assertThat(sent.latch.await(5, TimeUnit.SECONDS)).isTrue();
-		assertThat(sent.event).isNotNull();
-		assertThat(sent.count).isEqualTo(1);
+		AckMessageConfiguration ack = this.context.getBean(AckMessageConfiguration.class);
+		assertThat(ack.latch.await(5, TimeUnit.SECONDS)).isTrue();
+		assertThat(ack.event).isNotNull();
+		assertThat(ack.count).isEqualTo(1);
 	}
 
 	@Test
