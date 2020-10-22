@@ -49,7 +49,7 @@ import static org.springframework.cloud.bus.BusConstants.BUS_CONSUMER;
 @EnableConfigurationProperties(BusProperties.class)
 @AutoConfigureBefore(BindingServiceConfiguration.class)
 // so stream bindings work properly
-@AutoConfigureAfter({ LifecycleMvcEndpointAutoConfiguration.class, ServiceMatcherAutoConfiguration.class })
+@AutoConfigureAfter({ LifecycleMvcEndpointAutoConfiguration.class, PathServiceMatcherAutoConfiguration.class })
 // so actuator endpoints have needed dependencies
 public class BusAutoConfiguration {
 
@@ -104,8 +104,8 @@ public class BusAutoConfiguration {
 
 			@Bean
 			@ConditionalOnAvailableEndpoint
-			public EnvironmentBusEndpoint environmentBusEndpoint(ApplicationContext context, BusProperties bus) {
-				return new EnvironmentBusEndpoint(context, bus.getId());
+			public EnvironmentBusEndpoint environmentBusEndpoint(BusBridge busBridge, BusProperties bus) {
+				return new EnvironmentBusEndpoint(busBridge, bus.getId());
 			}
 
 		}

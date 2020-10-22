@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2015-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,33 +14,34 @@
  * limitations under the License.
  */
 
-package org.springframework.cloud.bus.endpoint;
+package org.springframework.cloud.bus.rsocket;
 
-import org.springframework.cloud.bus.BusBridge;
+import org.springframework.cloud.bus.ServiceMatcher;
 import org.springframework.cloud.bus.event.RemoteApplicationEvent;
-import org.springframework.context.ApplicationEvent;
-import org.springframework.context.ApplicationEventPublisher;
 
 /**
- * @author Spencer Gibb
+ * A pass thru patcher that allows the RSocket Routing broker to determine which instances to send to.
  */
-public class AbstractBusEndpoint {
+public class RSocketServiceMatcher implements ServiceMatcher {
 
-	private BusBridge busBridge;
+	private final String busId;
 
-	private String appId;
-
-	public AbstractBusEndpoint(BusBridge busBridge, String appId) {
-		this.busBridge = busBridge;
-		this.appId = appId;
+	public RSocketServiceMatcher(String busId) {
+		this.busId = busId;
 	}
 
-	protected String getInstanceId() {
-		return this.appId;
+	@Override
+	public boolean isFromSelf(RemoteApplicationEvent event) {
+		return false;
 	}
 
-	protected void publish(RemoteApplicationEvent event) {
-		this.busBridge.send(event);
+	@Override
+	public boolean isForSelf(RemoteApplicationEvent event) {
+		return true;
 	}
 
+	@Override
+	public String getBusId() {
+		return busId;
+	}
 }

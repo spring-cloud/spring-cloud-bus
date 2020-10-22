@@ -22,8 +22,8 @@ import java.util.Map;
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.actuate.endpoint.annotation.Selector;
 import org.springframework.boot.actuate.endpoint.annotation.WriteOperation;
+import org.springframework.cloud.bus.BusBridge;
 import org.springframework.cloud.bus.event.EnvironmentChangeRemoteApplicationEvent;
-import org.springframework.context.ApplicationEventPublisher;
 
 /**
  * @author Spencer Gibb
@@ -31,8 +31,8 @@ import org.springframework.context.ApplicationEventPublisher;
 @Endpoint(id = "busenv") // TODO: document
 public class EnvironmentBusEndpoint extends AbstractBusEndpoint {
 
-	public EnvironmentBusEndpoint(ApplicationEventPublisher context, String id) {
-		super(context, id);
+	public EnvironmentBusEndpoint(BusBridge busBridge, String id) {
+		super(busBridge, id);
 	}
 
 	@WriteOperation

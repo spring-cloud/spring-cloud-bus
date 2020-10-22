@@ -66,7 +66,7 @@ public class BusConsumer implements Consumer<RemoteApplicationEvent> {
 				this.publisher.publishEvent(event);
 			}
 			if (this.properties.getAck().isEnabled()) {
-				AckRemoteApplicationEvent ack = new AckRemoteApplicationEvent(this, this.serviceMatcher.getServiceId(),
+				AckRemoteApplicationEvent ack = new AckRemoteApplicationEvent(this, this.serviceMatcher.getBusId(),
 						this.properties.getAck().getDestinationService(), event.getDestinationService(), event.getId(),
 						event.getClass());
 				this.busBridge.send(ack);

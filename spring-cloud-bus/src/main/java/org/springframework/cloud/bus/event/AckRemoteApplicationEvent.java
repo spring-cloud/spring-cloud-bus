@@ -71,6 +71,7 @@ public class AckRemoteApplicationEvent extends RemoteApplicationEvent {
 	 * @param eventName the fq class name of the event implementation, not null
 	 */
 	@JsonProperty("event")
+	@SuppressWarnings("unchecked")
 	public void setEventName(String eventName) {
 		try {
 			this.event = (Class<? extends RemoteApplicationEvent>) Class.forName(eventName);

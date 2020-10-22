@@ -230,9 +230,9 @@ public class BusAutoConfigurationTests {
 	public void serviceMatcherIdIsConstantAfterRefresh() {
 		this.context = SpringApplication.run(new Class[] { RefreshConfig.class, },
 				new String[] { "--server.port=0", "--spring.main.allow-bean-definition-overriding=true" });
-		String originalServiceId = this.context.getBean(ServiceMatcher.class).getServiceId();
+		String originalServiceId = this.context.getBean(ServiceMatcher.class).getBusId();
 		this.context.getBean(ContextRefresher.class).refresh();
-		String newServiceId = this.context.getBean(ServiceMatcher.class).getServiceId();
+		String newServiceId = this.context.getBean(ServiceMatcher.class).getBusId();
 		assertThat(newServiceId).isEqualTo(originalServiceId);
 	}
 
