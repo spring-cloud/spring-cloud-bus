@@ -20,8 +20,8 @@ import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.actuate.endpoint.annotation.Selector;
 import org.springframework.boot.actuate.endpoint.annotation.WriteOperation;
 import org.springframework.cloud.bus.BusBridge;
+import org.springframework.cloud.bus.event.Destination;
 import org.springframework.cloud.bus.event.RefreshRemoteApplicationEvent;
-import org.springframework.context.ApplicationEventPublisher;
 
 /**
  * @author Spencer Gibb
@@ -29,18 +29,18 @@ import org.springframework.context.ApplicationEventPublisher;
 @Endpoint(id = "busrefresh") // TODO: document new id
 public class RefreshBusEndpoint extends AbstractBusEndpoint {
 
-	public RefreshBusEndpoint(BusBridge busBridge, String id) {
-		super(busBridge, id);
+	public RefreshBusEndpoint(BusBridge busBridge, String id, Destination.Factory destinationFactory) {
+		super(busBridge, id, destinationFactory);
 	}
 
 	@WriteOperation
 	public void busRefreshWithDestination(@Selector String destination) {
-		publish(new RefreshRemoteApplicationEvent(this, getInstanceId(), destination));
+		publish(new RefreshRemoteApplicationEvent(this, getInstanceId(), getDestination(destination)));
 	}
 
 	@WriteOperation
 	public void busRefresh() {
-		publish(new RefreshRemoteApplicationEvent(this, getInstanceId(), null));
+		publish(new RefreshRemoteApplicationEvent(this, getInstanceId(), getDestination(null)));
 	}
 
 }

@@ -22,6 +22,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.bus.endpoint.RefreshBusEndpoint;
+import org.springframework.cloud.bus.event.Destination;
 import org.springframework.cloud.bus.event.RefreshListener;
 import org.springframework.cloud.context.refresh.ContextRefresher;
 import org.springframework.context.annotation.Bean;
@@ -49,8 +50,9 @@ public class BusRefreshAutoConfiguration {
 
 		@Bean
 		@ConditionalOnAvailableEndpoint
-		public RefreshBusEndpoint refreshBusEndpoint(BusBridge busBridge, BusProperties bus) {
-			return new RefreshBusEndpoint(busBridge, bus.getId());
+		public RefreshBusEndpoint refreshBusEndpoint(BusBridge busBridge, BusProperties bus,
+				Destination.Factory destinationFactory) {
+			return new RefreshBusEndpoint(busBridge, bus.getId(), destinationFactory);
 		}
 
 	}

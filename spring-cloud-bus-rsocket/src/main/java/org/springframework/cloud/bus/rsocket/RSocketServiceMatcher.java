@@ -20,7 +20,8 @@ import org.springframework.cloud.bus.ServiceMatcher;
 import org.springframework.cloud.bus.event.RemoteApplicationEvent;
 
 /**
- * A pass thru patcher that allows the RSocket Routing broker to determine which instances to send to.
+ * A pass thru patcher that allows the RSocket Routing broker to determine which instances
+ * to send to.
  */
 public class RSocketServiceMatcher implements ServiceMatcher {
 
@@ -44,4 +45,5 @@ public class RSocketServiceMatcher implements ServiceMatcher {
 	public String getBusId() {
 		return busId;
 	}
+
 }

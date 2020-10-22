@@ -23,6 +23,7 @@ import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.actuate.endpoint.annotation.Selector;
 import org.springframework.boot.actuate.endpoint.annotation.WriteOperation;
 import org.springframework.cloud.bus.BusBridge;
+import org.springframework.cloud.bus.event.Destination;
 import org.springframework.cloud.bus.event.EnvironmentChangeRemoteApplicationEvent;
 
 /**
@@ -31,21 +32,22 @@ import org.springframework.cloud.bus.event.EnvironmentChangeRemoteApplicationEve
 @Endpoint(id = "busenv") // TODO: document
 public class EnvironmentBusEndpoint extends AbstractBusEndpoint {
 
-	public EnvironmentBusEndpoint(BusBridge busBridge, String id) {
-		super(busBridge, id);
+	public EnvironmentBusEndpoint(BusBridge busBridge, String id, Destination.Factory destinationFactory) {
+		super(busBridge, id, destinationFactory);
 	}
 
 	@WriteOperation
 	// TODO: document params
 	public void busEnvWithDestination(String name, String value, @Selector String destination) {
 		Map<String, String> params = Collections.singletonMap(name, value);
-		publish(new EnvironmentChangeRemoteApplicationEvent(this, getInstanceId(), destination, params));
+		publish(new EnvironmentChangeRemoteApplicationEvent(this, getInstanceId(), getDestination(destination),
+				params));
 	}
 
 	@WriteOperation
 	public void busEnv(String name, String value) { // TODO: document params
 		Map<String, String> params = Collections.singletonMap(name, value);
-		publish(new EnvironmentChangeRemoteApplicationEvent(this, getInstanceId(), null, params));
+		publish(new EnvironmentChangeRemoteApplicationEvent(this, getInstanceId(), getDestination(null), params));
 	}
 
 }

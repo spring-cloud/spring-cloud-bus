@@ -24,6 +24,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.cloud.bus.BusAutoConfiguration;
 import org.springframework.cloud.bus.BusRefreshAutoConfiguration;
 import org.springframework.cloud.bus.ConditionalOnBusEnabled;
+import org.springframework.cloud.bus.event.Destination;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -35,6 +36,13 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnClass({ RSocket.class, RoutingRSocketRequester.class })
 @AutoConfigureBefore({ BusAutoConfiguration.class, BusRefreshAutoConfiguration.class })
 public class BusRSocketAutoConfiguration {
+
+	@Bean
+	public Destination.Factory rsocketDestinationFactory() {
+		// simply pass thru for now
+		// TODO: default tags?
+		return originalDestination -> () -> originalDestination;
+	}
 
 	@Bean
 	public RSocketRequesterBusBridge rSocketRequesterBusBridge(RoutingRSocketRequester requester) {

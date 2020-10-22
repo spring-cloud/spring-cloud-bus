@@ -33,8 +33,11 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.bus.event.EnvironmentChangeRemoteApplicationEvent;
+import org.springframework.cloud.bus.event.RemoteApplicationEvent;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -42,8 +45,9 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
-@SpringBootTest(webEnvironment = RANDOM_PORT, properties = { "management.endpoints.web.exposure.include=*",
-		"logging.level.org.springframework.cloud.bus=TRACE", "spring.cloud.bus.id=app:1",
+@SpringBootTest(classes = BusAmqpIntegrationTests.LocalTestConfig.class, webEnvironment = RANDOM_PORT, properties = {
+		"management.endpoints.web.exposure.include=*", "logging.level.org.springframework.cloud.bus=TRACE",
+		"spring.cloud.bus.id=app:1",
 		"spring.autoconfigure.exclude=org.springframework.cloud.stream.test.binder.TestSupportBinderAutoConfiguration" })
 @Testcontainers
 public class BusAmqpIntegrationTests {
@@ -61,7 +65,7 @@ public class BusAmqpIntegrationTests {
 
 	@BeforeAll
 	static void before() {
-		context = new SpringApplicationBuilder(TestConfig.class).properties("server.port=0",
+		context = new SpringApplicationBuilder(RemoteTestConfig.class).properties("server.port=0",
 				"spring.rabbitmq.host=" + rabbitMQContainer.getHost(),
 				"spring.rabbitmq.port=" + rabbitMQContainer.getAmqpPort(),
 				"management.endpoints.web.exposure.include=*", "spring.cloud.bus.id=app:2",
@@ -77,27 +81,46 @@ public class BusAmqpIntegrationTests {
 	}
 
 	@Test
-	void remoteEventsAreSentViaAmqp(@Autowired WebTestClient client, @Autowired TestConfig testConfig)
+	void remoteEventsAreSentViaAmqp(@Autowired WebTestClient client, @Autowired LocalTestConfig testConfig)
 			throws InterruptedException {
 		assertThat(rabbitMQContainer.isRunning());
 		HashMap<String, String> map = new HashMap<>();
 		map.put("name", "foo");
 		map.put("value", "bar");
 		client.post().uri("/actuator/busenv").bodyValue(map).exchange().expectStatus().is2xxSuccessful();
-		TestConfig remoteTestConfig = context.getBean(TestConfig.class);
+		RemoteTestConfig remoteTestConfig = context.getBean(RemoteTestConfig.class);
 		assertThat(remoteTestConfig.latch.await(5, TimeUnit.SECONDS)).isTrue();
 		assertThat(testConfig.latch.await(5, TimeUnit.SECONDS)).isTrue();
 	}
 
 	@SpringBootConfiguration
 	@EnableAutoConfiguration
-	static class TestConfig implements ApplicationListener<EnvironmentChangeRemoteApplicationEvent> {
+	static class RemoteTestConfig implements ApplicationListener<EnvironmentChangeRemoteApplicationEvent> {
 
 		CountDownLatch latch = new CountDownLatch(1);
 
 		@Override
 		public void onApplicationEvent(EnvironmentChangeRemoteApplicationEvent event) {
 			latch.countDown();
+		}
+
+	}
+
+	@SpringBootConfiguration
+	@EnableAutoConfiguration
+	static class LocalTestConfig {
+
+		CountDownLatch latch = new CountDownLatch(1);
+
+		@Bean
+		public StreamBusBridge streamBusBridge(StreamBridge streamBridge, BusProperties properties) {
+			return new StreamBusBridge(streamBridge, properties) {
+				@Override
+				public void send(RemoteApplicationEvent event) {
+					latch.countDown();
+					super.send(event);
+				}
+			};
 		}
 
 	}

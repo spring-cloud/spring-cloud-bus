@@ -22,6 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.springframework.cloud.bus.event.AckRemoteApplicationEvent;
+import org.springframework.cloud.bus.event.Destination;
 import org.springframework.cloud.bus.event.RemoteApplicationEvent;
 import org.springframework.cloud.bus.event.SentApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
@@ -38,12 +39,15 @@ public class BusConsumer implements Consumer<RemoteApplicationEvent> {
 
 	private final BusProperties properties;
 
+	private final Destination.Factory destinationFactory;
+
 	public BusConsumer(ApplicationEventPublisher publisher, ServiceMatcher serviceMatcher, BusBridge busBridge,
-			BusProperties properties) {
+			BusProperties properties, Destination.Factory destinationFactory) {
 		this.publisher = publisher;
 		this.serviceMatcher = serviceMatcher;
 		this.busBridge = busBridge;
 		this.properties = properties;
+		this.destinationFactory = destinationFactory;
 	}
 
 	@Override
@@ -67,8 +71,8 @@ public class BusConsumer implements Consumer<RemoteApplicationEvent> {
 			}
 			if (this.properties.getAck().isEnabled()) {
 				AckRemoteApplicationEvent ack = new AckRemoteApplicationEvent(this, this.serviceMatcher.getBusId(),
-						this.properties.getAck().getDestinationService(), event.getDestinationService(), event.getId(),
-						event.getClass());
+						destinationFactory.getDestination(this.properties.getAck().getDestinationService()),
+						event.getDestinationService(), event.getId(), event.getClass());
 				this.busBridge.send(ack);
 				this.publisher.publishEvent(ack);
 			}

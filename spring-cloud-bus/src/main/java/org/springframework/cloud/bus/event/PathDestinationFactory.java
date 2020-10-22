@@ -16,16 +16,12 @@
 
 package org.springframework.cloud.bus.event;
 
-import java.util.Objects;
-
-import org.springframework.core.style.ToStringCreator;
 import org.springframework.util.StringUtils;
 
-public class PathDestination implements Destination {
-	
-	private final String path;
+public class PathDestinationFactory implements Destination.Factory {
 
-	public PathDestination(String path) {
+	public Destination getDestination(String originalDestination) {
+		String path = originalDestination;
 		if (path == null) {
 			path = "**";
 		}
@@ -33,37 +29,14 @@ public class PathDestination implements Destination {
 		// follows if there at most two path elements, and last element is not a global
 		// wildcard already
 		if (!"**".equals(path)) {
-			if (StringUtils.countOccurrencesOf(path, ":") <= 1
-				&& !StringUtils.endsWithIgnoreCase(path, ":**")) {
+			if (StringUtils.countOccurrencesOf(path, ":") <= 1 && !StringUtils.endsWithIgnoreCase(path, ":**")) {
 				// All instances of the destination unless specifically requested
 				path = path + ":**";
 			}
 		}
-		this.path = path;
+
+		final String finalPath = path;
+		return () -> finalPath;
 	}
 
-	public String getPath() {
-		return this.path;
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-		PathDestination that = (PathDestination) o;
-		return this.path.equals(that.path);
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(this.path);
-	}
-
-	@Override
-	public String toString() {
-		return new ToStringCreator(this)
-			.append("path", path)
-			.toString();
-
-	}
 }

@@ -17,9 +17,8 @@
 package org.springframework.cloud.bus.endpoint;
 
 import org.springframework.cloud.bus.BusBridge;
+import org.springframework.cloud.bus.event.Destination;
 import org.springframework.cloud.bus.event.RemoteApplicationEvent;
-import org.springframework.context.ApplicationEvent;
-import org.springframework.context.ApplicationEventPublisher;
 
 /**
  * @author Spencer Gibb
@@ -30,13 +29,24 @@ public class AbstractBusEndpoint {
 
 	private String appId;
 
-	public AbstractBusEndpoint(BusBridge busBridge, String appId) {
+	private final Destination.Factory destinationFactory;
+
+	public AbstractBusEndpoint(BusBridge busBridge, String appId, Destination.Factory destinationFactory) {
 		this.busBridge = busBridge;
 		this.appId = appId;
+		this.destinationFactory = destinationFactory;
 	}
 
 	protected String getInstanceId() {
 		return this.appId;
+	}
+
+	protected Destination.Factory getDestinationFactory() {
+		return this.destinationFactory;
+	}
+
+	protected Destination getDestination(String original) {
+		return destinationFactory.getDestination(original);
 	}
 
 	protected void publish(RemoteApplicationEvent event) {

@@ -44,9 +44,9 @@ public class AckRemoteApplicationEvent extends RemoteApplicationEvent {
 		this.event = null;
 	}
 
-	public AckRemoteApplicationEvent(Object source, String originService, String destinationService,
+	public AckRemoteApplicationEvent(Object source, String originService, Destination destination,
 			String ackDestinationService, String ackId, Class<? extends RemoteApplicationEvent> type) {
-		super(source, originService, destinationService);
+		super(source, originService, destination);
 		this.ackDestinationService = ackDestinationService;
 		this.ackId = ackId;
 		this.event = type;

@@ -17,4 +17,14 @@
 package org.springframework.cloud.bus.event;
 
 public interface Destination {
+
+	String getDestinationAsString();
+
+	@FunctionalInterface
+	interface Factory {
+
+		Destination getDestination(String originalDestination);
+
+	}
+
 }
