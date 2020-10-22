@@ -16,11 +16,17 @@
 
 package org.springframework.cloud.bus.rsocket;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import io.rsocket.routing.client.spring.RoutingRSocketRequester;
+import io.rsocket.routing.common.Key;
+import io.rsocket.routing.common.WellKnownKey;
 
 import org.springframework.cloud.bus.BusBridge;
 import org.springframework.cloud.bus.BusConstants;
 import org.springframework.cloud.bus.event.RemoteApplicationEvent;
+import org.springframework.util.StringUtils;
 
 public class RSocketRequesterBusBridge implements BusBridge {
 
@@ -32,14 +38,42 @@ public class RSocketRequesterBusBridge implements BusBridge {
 
 	@Override
 	public void send(RemoteApplicationEvent event) {
-		RSocketDestination destination = null; //(RSocketDestination) event.getDestination();
-		// cast to RSocketDestination
-		requester.route(BusConstants.BUS_CONSUMER)
-			.address(builder -> {
-				// get tags out of destination
-				destination.getTags().forEach(builder::with);
-			})
-			.data(event)
-			.send().subscribe();
+		requester.route(BusConstants.BUS_CONSUMER).address(builder -> {
+			// get tags out of destination
+			getTagsFromDestination(event.getDestinationService()).forEach(builder::with);
+		}).data(event).send().subscribe();
 	}
+
+	private static Map<Key, String> getTagsFromDestination(String delimitedProperties) {
+		String[] properties = StringUtils.tokenizeToStringArray(delimitedProperties, ";");
+		Map<Key, String> map = new HashMap<>();
+		for (String property : properties) {
+			int index = lowestIndexOf(property, ":", "=");
+			String key = (index > 0) ? property.substring(0, index) : property;
+			String value = (index > 0) ? property.substring(index + 1) : null;
+
+			try {
+				WellKnownKey wellKnownKey = WellKnownKey.valueOf(key);
+				map.put(Key.of(wellKnownKey), value);
+			}
+			catch (IllegalArgumentException e) {
+				// not a WellKnownKey, use string
+				map.put(Key.of(key), value);
+			}
+
+		}
+		return map;
+	}
+
+	private static int lowestIndexOf(String property, String... candidates) {
+		int index = -1;
+		for (String candidate : candidates) {
+			int candidateIndex = property.indexOf(candidate);
+			if (candidateIndex > 0) {
+				index = (index != -1) ? Math.min(index, candidateIndex) : candidateIndex;
+			}
+		}
+		return index;
+	}
+
 }
