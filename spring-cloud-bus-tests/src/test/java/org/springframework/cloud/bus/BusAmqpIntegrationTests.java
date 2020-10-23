@@ -43,8 +43,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 @SpringBootTest(webEnvironment = RANDOM_PORT, properties = { "management.endpoints.web.exposure.include=*",
-	"logging.level.org.springframework.cloud.bus=TRACE", "spring.cloud.bus.id=app:1",
-	"spring.autoconfigure.exclude=org.springframework.cloud.stream.test.binder.TestSupportBinderAutoConfiguration" })
+		"logging.level.org.springframework.cloud.bus=TRACE", "spring.cloud.bus.id=app:1",
+		"spring.autoconfigure.exclude=org.springframework.cloud.stream.test.binder.TestSupportBinderAutoConfiguration" })
 @Testcontainers
 public class BusAmqpIntegrationTests {
 
@@ -62,11 +62,11 @@ public class BusAmqpIntegrationTests {
 	@BeforeAll
 	static void before() {
 		context = new SpringApplicationBuilder(TestConfig.class).properties("server.port=0",
-			"spring.rabbitmq.host=" + rabbitMQContainer.getHost(),
-			"spring.rabbitmq.port=" + rabbitMQContainer.getAmqpPort(),
-			"management.endpoints.web.exposure.include=*", "spring.cloud.bus.id=app:2",
-			"spring.autoconfigure.exclude=org.springframework.cloud.stream.test.binder.TestSupportBinderAutoConfiguration")
-			.run();
+				"spring.rabbitmq.host=" + rabbitMQContainer.getHost(),
+				"spring.rabbitmq.port=" + rabbitMQContainer.getAmqpPort(),
+				"management.endpoints.web.exposure.include=*", "spring.cloud.bus.id=app:2",
+				"spring.autoconfigure.exclude=org.springframework.cloud.stream.test.binder.TestSupportBinderAutoConfiguration")
+				.run();
 	}
 
 	@AfterAll
@@ -78,7 +78,7 @@ public class BusAmqpIntegrationTests {
 
 	@Test
 	void remoteEventsAreSentViaAmqp(@Autowired WebTestClient client, @Autowired TestConfig testConfig)
-		throws InterruptedException {
+			throws InterruptedException {
 		assertThat(rabbitMQContainer.isRunning());
 		HashMap<String, String> map = new HashMap<>();
 		map.put("name", "foo");
