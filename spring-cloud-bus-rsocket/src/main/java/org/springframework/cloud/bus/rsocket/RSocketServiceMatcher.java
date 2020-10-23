@@ -18,6 +18,7 @@ package org.springframework.cloud.bus.rsocket;
 
 import org.springframework.cloud.bus.ServiceMatcher;
 import org.springframework.cloud.bus.event.RemoteApplicationEvent;
+import org.springframework.util.AntPathMatcher;
 
 /**
  * A pass thru patcher that allows the RSocket Routing broker to determine which instances
@@ -27,13 +28,17 @@ public class RSocketServiceMatcher implements ServiceMatcher {
 
 	private final String busId;
 
+	private final AntPathMatcher antPathMatcher = new AntPathMatcher();
+
 	public RSocketServiceMatcher(String busId) {
 		this.busId = busId;
 	}
 
 	@Override
 	public boolean isFromSelf(RemoteApplicationEvent event) {
-		return false;
+		String originService = event.getOriginService();
+		String serviceId = getBusId();
+		return antPathMatcher.match(originService, serviceId);
 	}
 
 	@Override
