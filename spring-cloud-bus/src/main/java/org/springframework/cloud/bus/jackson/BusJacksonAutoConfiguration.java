@@ -23,6 +23,7 @@ import java.util.Set;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.InvalidTypeIdException;
+import com.fasterxml.jackson.dataformat.cbor.CBORFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -47,6 +48,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.converter.AbstractMessageConverter;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.MimeType;
 import org.springframework.util.MimeTypeUtils;
 
 /**
@@ -70,6 +72,12 @@ public class BusJacksonAutoConfiguration {
 		return new BusJacksonMessageConverter(objectMapper);
 	}
 
+	@Bean
+	@ConditionalOnClass(name = "com.fasterxml.jackson.dataformat.cbor.CBORFactory")
+	public AbstractMessageConverter busCborConverter() {
+		return new BusJacksonMessageConverter(new MimeType("application", "cbor"), new ObjectMapper(new CBORFactory()));
+	}
+
 }
 
 class BusJacksonMessageConverter extends AbstractMessageConverter implements InitializingBean {
@@ -90,7 +98,12 @@ class BusJacksonMessageConverter extends AbstractMessageConverter implements Ini
 
 	@Autowired(required = false)
 	BusJacksonMessageConverter(@Nullable ObjectMapper objectMapper) {
-		super(MimeTypeUtils.APPLICATION_JSON);
+		this(MimeTypeUtils.APPLICATION_JSON, objectMapper);
+	}
+
+	@Autowired(required = false)
+	BusJacksonMessageConverter(MimeType mimeType, @Nullable ObjectMapper objectMapper) {
+		super(mimeType);
 
 		if (objectMapper != null) {
 			this.mapper = objectMapper;

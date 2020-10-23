@@ -41,6 +41,10 @@
 			<artifactId>spring-cloud-function-rsocket</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.fasterxml.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-cbor</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>io.rsocket.routing</groupId>
 			<artifactId>rsocket-routing-client-spring</artifactId>
 			<version>${rsocket-routing.version}</version>
