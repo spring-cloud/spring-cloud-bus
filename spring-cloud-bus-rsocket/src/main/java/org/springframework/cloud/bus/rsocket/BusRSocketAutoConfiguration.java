@@ -22,8 +22,10 @@ import io.rsocket.routing.client.spring.RoutingRSocketRequester;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.cloud.bus.BusAutoConfiguration;
+import org.springframework.cloud.bus.BusProperties;
 import org.springframework.cloud.bus.BusRefreshAutoConfiguration;
 import org.springframework.cloud.bus.ConditionalOnBusEnabled;
+import org.springframework.cloud.bus.PathServiceMatcherAutoConfiguration;
 import org.springframework.cloud.bus.event.Destination;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,7 +36,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnBusEnabled
 @ConditionalOnClass({ RSocket.class, RoutingRSocketRequester.class })
-@AutoConfigureBefore({ BusAutoConfiguration.class, BusRefreshAutoConfiguration.class })
+@AutoConfigureBefore({ BusAutoConfiguration.class, BusRefreshAutoConfiguration.class,
+		PathServiceMatcherAutoConfiguration.class })
 public class BusRSocketAutoConfiguration {
 
 	@Bean
@@ -47,6 +50,11 @@ public class BusRSocketAutoConfiguration {
 	@Bean
 	public RSocketRequesterBusBridge rSocketRequesterBusBridge(RoutingRSocketRequester requester) {
 		return new RSocketRequesterBusBridge(requester);
+	}
+
+	@Bean
+	public RSocketServiceMatcher rSocketServiceMatcher(BusProperties properties) {
+		return new RSocketServiceMatcher(properties.getId());
 	}
 
 }
