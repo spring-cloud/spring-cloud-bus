@@ -22,6 +22,7 @@ import java.util.Map;
 import io.rsocket.routing.client.spring.RoutingRSocketRequester;
 import io.rsocket.routing.common.Key;
 import io.rsocket.routing.common.WellKnownKey;
+import io.rsocket.routing.frames.RoutingType;
 
 import org.springframework.cloud.bus.BusBridge;
 import org.springframework.cloud.bus.BusConstants;
@@ -39,6 +40,7 @@ public class RSocketRequesterBusBridge implements BusBridge {
 	@Override
 	public void send(RemoteApplicationEvent event) {
 		requester.route(BusConstants.BUS_CONSUMER).address(builder -> {
+			builder.routingType(RoutingType.MULTICAST);
 			// get tags out of destination
 			getTagsFromDestination(event.getDestinationService()).forEach(builder::with);
 		}).data(event).send().subscribe();
@@ -57,8 +59,14 @@ public class RSocketRequesterBusBridge implements BusBridge {
 				map.put(Key.of(wellKnownKey), value);
 			}
 			catch (IllegalArgumentException e) {
-				// not a WellKnownKey, use string
-				map.put(Key.of(key), value);
+				try {
+					WellKnownKey wellKnownKey = WellKnownKey.valueOf(key.toUpperCase());
+					map.put(Key.of(wellKnownKey), value);
+				}
+				catch (IllegalArgumentException e2) {
+					// not a WellKnownKey, use string
+					map.put(Key.of(key), value);
+				}
 			}
 
 		}
