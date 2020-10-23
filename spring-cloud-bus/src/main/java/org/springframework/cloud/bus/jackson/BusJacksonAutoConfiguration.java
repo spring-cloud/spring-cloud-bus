@@ -72,10 +72,16 @@ public class BusJacksonAutoConfiguration {
 		return new BusJacksonMessageConverter(objectMapper);
 	}
 
-	@Bean
-	@ConditionalOnClass(name = "com.fasterxml.jackson.dataformat.cbor.CBORFactory")
-	public AbstractMessageConverter busCborConverter() {
-		return new BusJacksonMessageConverter(new MimeType("application", "cbor"), new ObjectMapper(new CBORFactory()));
+	@Configuration(proxyBeanMethods = false)
+	@ConditionalOnClass(CBORFactory.class)
+	protected static class CborConfiguration {
+
+		@Bean
+		public AbstractMessageConverter busCborConverter() {
+			return new BusJacksonMessageConverter(new MimeType("application", "cbor"),
+					new ObjectMapper(new CBORFactory()));
+		}
+
 	}
 
 }
