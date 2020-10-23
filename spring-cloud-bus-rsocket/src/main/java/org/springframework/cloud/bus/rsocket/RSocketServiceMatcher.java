@@ -16,9 +16,18 @@
 
 package org.springframework.cloud.bus.rsocket;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import io.rsocket.routing.client.spring.RoutingClientProperties;
+import io.rsocket.routing.common.Key;
+import io.rsocket.routing.common.WellKnownKey;
+
 import org.springframework.cloud.bus.ServiceMatcher;
 import org.springframework.cloud.bus.event.RemoteApplicationEvent;
 import org.springframework.util.AntPathMatcher;
+
+import static org.springframework.cloud.bus.rsocket.RSocketRequesterBusBridge.getTagsFromDestination;
 
 /**
  * A pass thru patcher that allows the RSocket Routing broker to determine which instances
@@ -28,10 +37,16 @@ public class RSocketServiceMatcher implements ServiceMatcher {
 
 	private final String busId;
 
+	private final RoutingClientProperties properties;
+
 	private final AntPathMatcher antPathMatcher = new AntPathMatcher();
 
-	public RSocketServiceMatcher(String busId) {
+	private final Map<Key, String> localTags = new HashMap<>();
+
+	public RSocketServiceMatcher(String busId, RoutingClientProperties properties) {
 		this.busId = busId;
+		this.properties = properties;
+		convertLocalTags(properties);
 	}
 
 	@Override
@@ -43,7 +58,26 @@ public class RSocketServiceMatcher implements ServiceMatcher {
 
 	@Override
 	public boolean isForSelf(RemoteApplicationEvent event) {
+		Map<Key, String> tags = getTagsFromDestination(event.getDestinationService());
+		for (Map.Entry<Key, String> entry : tags.entrySet()) {
+			String existingValue = localTags.get(entry.getKey());
+			if (existingValue == null || !existingValue.equals(entry.getValue())) {
+				return false;
+			}
+		}
 		return true;
+	}
+
+	private void convertLocalTags(RoutingClientProperties properties) {
+		properties.getTags().forEach((key, value) -> {
+			if (key.getWellKnownKey() != null) {
+				localTags.put(Key.of(key.getWellKnownKey()), value);
+			}
+			else {
+				localTags.put(Key.of(key.getKey()), value);
+			}
+		});
+		localTags.put(Key.of(WellKnownKey.SERVICE_NAME), properties.getServiceName());
 	}
 
 	@Override

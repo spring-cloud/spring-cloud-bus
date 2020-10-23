@@ -17,6 +17,7 @@
 package org.springframework.cloud.bus.rsocket;
 
 import io.rsocket.RSocket;
+import io.rsocket.routing.client.spring.RoutingClientProperties;
 import io.rsocket.routing.client.spring.RoutingRSocketRequester;
 
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
@@ -52,8 +53,9 @@ public class BusRSocketAutoConfiguration {
 	}
 
 	@Bean
-	public RSocketServiceMatcher rSocketServiceMatcher(BusProperties properties) {
-		return new RSocketServiceMatcher(properties.getId());
+	public RSocketServiceMatcher rSocketServiceMatcher(BusProperties properties,
+			RoutingClientProperties routingClientProperties) {
+		return new RSocketServiceMatcher(properties.getId(), routingClientProperties);
 	}
 
 }

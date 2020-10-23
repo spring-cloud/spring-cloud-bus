@@ -46,11 +46,11 @@ public class RSocketRequesterBusBridge implements BusBridge {
 		}).data(event).send().subscribe();
 	}
 
-	private static Map<Key, String> getTagsFromDestination(String delimitedProperties) {
-		String[] properties = StringUtils.tokenizeToStringArray(delimitedProperties, ";");
+	static Map<Key, String> getTagsFromDestination(String delimitedProperties) {
+		String[] properties = StringUtils.tokenizeToStringArray(delimitedProperties, ":");
 		Map<Key, String> map = new HashMap<>();
 		for (String property : properties) {
-			int index = lowestIndexOf(property, ":", "=");
+			int index = lowestIndexOf(property, "=");
 			String key = (index > 0) ? property.substring(0, index) : property;
 			String value = (index > 0) ? property.substring(index + 1) : null;
 

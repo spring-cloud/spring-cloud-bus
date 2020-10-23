@@ -21,10 +21,12 @@ import java.util.Map;
 
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.actuate.endpoint.annotation.Selector;
+import org.springframework.boot.actuate.endpoint.annotation.Selector.Match;
 import org.springframework.boot.actuate.endpoint.annotation.WriteOperation;
 import org.springframework.cloud.bus.event.Destination;
 import org.springframework.cloud.bus.event.EnvironmentChangeRemoteApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.util.StringUtils;
 
 /**
  * @author Spencer Gibb
@@ -39,8 +41,10 @@ public class EnvironmentBusEndpoint extends AbstractBusEndpoint {
 
 	@WriteOperation
 	// TODO: document params
-	public void busEnvWithDestination(String name, String value, @Selector String destination) {
+	public void busEnvWithDestination(String name, String value,
+			@Selector(match = Match.ALL_REMAINING) String[] destinations) {
 		Map<String, String> params = Collections.singletonMap(name, value);
+		String destination = StringUtils.arrayToDelimitedString(destinations, ":");
 		publish(new EnvironmentChangeRemoteApplicationEvent(this, getInstanceId(), getDestination(destination),
 				params));
 	}

@@ -18,10 +18,12 @@ package org.springframework.cloud.bus.endpoint;
 
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.actuate.endpoint.annotation.Selector;
+import org.springframework.boot.actuate.endpoint.annotation.Selector.Match;
 import org.springframework.boot.actuate.endpoint.annotation.WriteOperation;
 import org.springframework.cloud.bus.event.Destination;
 import org.springframework.cloud.bus.event.RefreshRemoteApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.util.StringUtils;
 
 /**
  * @author Spencer Gibb
@@ -34,7 +36,8 @@ public class RefreshBusEndpoint extends AbstractBusEndpoint {
 	}
 
 	@WriteOperation
-	public void busRefreshWithDestination(@Selector String destination) {
+	public void busRefreshWithDestination(@Selector(match = Match.ALL_REMAINING) String[] destinations) {
+		String destination = StringUtils.arrayToDelimitedString(destinations, ":");
 		publish(new RefreshRemoteApplicationEvent(this, getInstanceId(), getDestination(destination)));
 	}
 

@@ -36,10 +36,10 @@ public class RoutingClientDestinationFactory implements Destination.Factory {
 			String keyStr = (key.getWellKnownKey() != null) ? key.getWellKnownKey().name() : key.getKey();
 			entries.add(keyStr + "=" + s);
 		});
-		String defaultTags = StringUtils.collectionToDelimitedString(entries, ";");
+		String defaultTags = StringUtils.collectionToDelimitedString(entries, ":");
 		return () -> {
 			String destination = (StringUtils.isEmpty(originalDestination)) ? defaultTags
-					: defaultTags + ";" + originalDestination;
+					: defaultTags + ":" + originalDestination;
 			if (StringUtils.isEmpty(destination)) {
 				throw new IllegalArgumentException("destination may not be empty");
 			}
