@@ -21,6 +21,7 @@ import java.util.function.Consumer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.cloud.bus.event.AckRemoteApplicationEvent;
 import org.springframework.cloud.bus.event.Destination;
 import org.springframework.cloud.bus.event.RemoteApplicationEvent;
@@ -35,14 +36,14 @@ public class BusConsumer implements Consumer<RemoteApplicationEvent> {
 
 	private final ServiceMatcher serviceMatcher;
 
-	private final BusBridge busBridge;
+	private final ObjectProvider<BusBridge> busBridge;
 
 	private final BusProperties properties;
 
 	private final Destination.Factory destinationFactory;
 
-	public BusConsumer(ApplicationEventPublisher publisher, ServiceMatcher serviceMatcher, BusBridge busBridge,
-			BusProperties properties, Destination.Factory destinationFactory) {
+	public BusConsumer(ApplicationEventPublisher publisher, ServiceMatcher serviceMatcher,
+			ObjectProvider<BusBridge> busBridge, BusProperties properties, Destination.Factory destinationFactory) {
 		this.publisher = publisher;
 		this.serviceMatcher = serviceMatcher;
 		this.busBridge = busBridge;
@@ -73,7 +74,7 @@ public class BusConsumer implements Consumer<RemoteApplicationEvent> {
 				AckRemoteApplicationEvent ack = new AckRemoteApplicationEvent(this, this.serviceMatcher.getBusId(),
 						destinationFactory.getDestination(this.properties.getAck().getDestinationService()),
 						event.getDestinationService(), event.getId(), event.getClass());
-				this.busBridge.send(ack);
+				this.busBridge.ifAvailable(bridge -> bridge.send(ack));
 				this.publisher.publishEvent(ack);
 			}
 		}
