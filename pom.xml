@@ -25,6 +25,7 @@
 		<module>spring-cloud-bus-tests</module>
 		<module>spring-cloud-starter-bus-amqp</module>
 		<module>spring-cloud-starter-bus-kafka</module>
+		<module>spring-cloud-starter-bus-stream</module>
 		<module>docs</module>
 	</modules>
 
