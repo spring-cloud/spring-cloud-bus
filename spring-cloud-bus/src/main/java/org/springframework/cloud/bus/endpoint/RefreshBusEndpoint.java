@@ -19,9 +19,9 @@ package org.springframework.cloud.bus.endpoint;
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.actuate.endpoint.annotation.Selector;
 import org.springframework.boot.actuate.endpoint.annotation.WriteOperation;
-import org.springframework.cloud.bus.BusBridge;
 import org.springframework.cloud.bus.event.Destination;
 import org.springframework.cloud.bus.event.RefreshRemoteApplicationEvent;
+import org.springframework.context.ApplicationEventPublisher;
 
 /**
  * @author Spencer Gibb
@@ -29,8 +29,8 @@ import org.springframework.cloud.bus.event.RefreshRemoteApplicationEvent;
 @Endpoint(id = "busrefresh") // TODO: document new id
 public class RefreshBusEndpoint extends AbstractBusEndpoint {
 
-	public RefreshBusEndpoint(BusBridge busBridge, String id, Destination.Factory destinationFactory) {
-		super(busBridge, id, destinationFactory);
+	public RefreshBusEndpoint(ApplicationEventPublisher publisher, String id, Destination.Factory destinationFactory) {
+		super(publisher, id, destinationFactory);
 	}
 
 	@WriteOperation

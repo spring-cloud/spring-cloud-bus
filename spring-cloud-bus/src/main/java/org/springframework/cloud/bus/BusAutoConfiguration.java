@@ -111,9 +111,9 @@ public class BusAutoConfiguration {
 
 			@Bean
 			@ConditionalOnAvailableEndpoint
-			public EnvironmentBusEndpoint environmentBusEndpoint(BusBridge busBridge, BusProperties bus,
+			public EnvironmentBusEndpoint environmentBusEndpoint(ApplicationEventPublisher publisher, BusProperties bus,
 					Destination.Factory destinationFactory) {
-				return new EnvironmentBusEndpoint(busBridge, bus.getId(), destinationFactory);
+				return new EnvironmentBusEndpoint(publisher, bus.getId(), destinationFactory);
 			}
 
 		}

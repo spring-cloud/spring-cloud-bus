@@ -25,6 +25,7 @@ import org.springframework.cloud.bus.endpoint.RefreshBusEndpoint;
 import org.springframework.cloud.bus.event.Destination;
 import org.springframework.cloud.bus.event.RefreshListener;
 import org.springframework.cloud.context.refresh.ContextRefresher;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -50,9 +51,9 @@ public class BusRefreshAutoConfiguration {
 
 		@Bean
 		@ConditionalOnAvailableEndpoint
-		public RefreshBusEndpoint refreshBusEndpoint(BusBridge busBridge, BusProperties bus,
+		public RefreshBusEndpoint refreshBusEndpoint(ApplicationEventPublisher publisher, BusProperties bus,
 				Destination.Factory destinationFactory) {
-			return new RefreshBusEndpoint(busBridge, bus.getId(), destinationFactory);
+			return new RefreshBusEndpoint(publisher, bus.getId(), destinationFactory);
 		}
 
 	}
