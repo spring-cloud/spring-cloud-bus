@@ -35,7 +35,9 @@ public abstract class RemoteApplicationEvent extends ApplicationEvent {
 
 	private static final Object TRANSIENT_SOURCE = new Object();
 
-	private static final String TRANSIENT_ORIGIN = "____default_origin_service___";
+	private static final String TRANSIENT_ORIGIN = "____transient_origin_service___";
+
+	private static final String TRANSIENT_DESTINATION = "____transient_destination___";
 
 	protected static final PathDestinationFactory DEFAULT_DESTINATION_FACTORY = new PathDestinationFactory();
 
@@ -47,7 +49,7 @@ public abstract class RemoteApplicationEvent extends ApplicationEvent {
 
 	protected RemoteApplicationEvent() {
 		// for serialization libs like jackson
-		this(TRANSIENT_SOURCE, TRANSIENT_ORIGIN, DEFAULT_DESTINATION_FACTORY.getDestination(null));
+		this(TRANSIENT_SOURCE, TRANSIENT_ORIGIN, DEFAULT_DESTINATION_FACTORY.getDestination(TRANSIENT_DESTINATION));
 	}
 
 	@Deprecated
