@@ -1,3 +1,4 @@
+[[spring-cloud-bus]]
 = Spring Cloud Bus
 include::_attributes.adoc[]
 
@@ -5,16 +6,19 @@ include::intro.adoc[]
 
 include::https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/master/docs/src/main/asciidoc/contributing-docs.adoc[]
 
+[[quick-start]]
 == Quick Start
 
 include::quickstart.adoc[]
 
+[[bus-endpoints]]
 == Bus Endpoints
 
 Spring Cloud Bus provides two endpoints, `/actuator/busrefresh` and `/actuator/busenv`
 that correspond to individual actuator endpoints in Spring Cloud Commons,
 `/actuator/refresh` and `/actuator/env` respectively.
 
+[[bus-refresh-endpoint]]
 === Bus Refresh Endpoint
 The `/actuator/busrefresh` endpoint clears the `RefreshScope` cache and rebinds
 `@ConfigurationProperties`. See the <<refresh-scope,Refresh Scope>> documentation for
@@ -28,6 +32,7 @@ application:
 management.endpoints.web.exposure.include=busrefresh
 ----
 
+[[bus-env-endpoint]]
 === Bus Env Endpoint
 The `/actuator/busenv` endpoint updates each instances environment with the specified
 key/value pair across multiple instances.
@@ -50,6 +55,7 @@ The `/actuator/busenv` endpoint accepts `POST` requests with the following shape
 }
 ----
 
+[[addressing-an-instance]]
 == Addressing an Instance
 
 Each instance of the application has a service ID, whose value can be set with
@@ -69,6 +75,7 @@ The HTTP endpoints accept a "`destination`" path parameter, such as
 is owned by an instance on the bus, it processes the message, and all other instances
 ignore it.
 
+[[addressing-all-instances-of-a-service]]
 == Addressing All Instances of a Service
 
 The "`destination`" parameter is used in a Spring `PathMatcher` (with the path separator
@@ -76,6 +83,7 @@ as a colon -- `:`) to determine if an instance processes the message. Using the 
 from earlier, `/busenv/customers:**` targets all instances of the
 "`customers`" service regardless of the rest of the service ID.
 
+[[service-id-must-be-unique]]
 == Service ID Must Be Unique
 
 The bus tries twice to eliminate processing an event -- once from the original
@@ -86,6 +94,7 @@ port, and that port is part of the ID. Cloud Foundry supplies an index to differ
 To ensure that the ID is unique outside Cloud Foundry, set `spring.application.index` to
 something unique for each instance of a service.
 
+[[customizing-the-message-broker]]
 == Customizing the Message Broker
 
 Spring Cloud Bus uses https://cloud.spring.io/spring-cloud-stream[Spring Cloud Stream] to
@@ -102,6 +111,7 @@ middleware). Normally, the defaults suffice.
 To learn more about how to customize the message broker settings, consult the Spring Cloud
 Stream documentation.
 
+[[tracing-bus-events]]
 == Tracing Bus Events
 
 Bus events (subclasses of `RemoteApplicationEvent`) can be traced by setting
@@ -156,6 +166,7 @@ NOTE: Any Bus application can trace acks. However, sometimes, it is
 useful to do this in a central service that can do more complex
 queries on the data or forward it to a specialized tracing service.
 
+[[broadcasting-your-own-events]]
 == Broadcasting Your Own Events
 
 The Bus can carry any event of type `RemoteApplicationEvent`. The default transport is
@@ -168,6 +179,7 @@ the default strategy, which is to use the simple name of the class.
 
 NOTE: Both the producer and the consumer need access to the class definition.
 
+[[registering-events-in-custom-packages]]
 === Registering events in custom packages
 
 If you cannot or do not want to use a subpackage of `org.springframework.cloud.bus.event`
@@ -226,6 +238,7 @@ All of the preceding examples of `@RemoteApplicationEventScan` are equivalent, i
 
 NOTE: You can specify multiple base packages to scan.
 
+[[configuration-properties]]
 == Configuration properties
 
 To see the list of all Bus related configuration properties please check link:appendix.html[the Appendix page].
