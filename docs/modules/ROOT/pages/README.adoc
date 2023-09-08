@@ -1,13 +1,10 @@
 [[spring-cloud-bus]]
 = Spring Cloud Bus
-include::_attributes.adoc[]
 
-include::intro.adoc[]
 
 [[quick-start]]
 == Quick Start
 
-include::quickstart.adoc[]
 
 [[building]]
 == Building
