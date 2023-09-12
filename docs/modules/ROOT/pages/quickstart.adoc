@@ -1,5 +1,5 @@
 [[spring-cloud-gateway-quickstart]]
-== Quickstart
+= Quickstart
 
 Spring Cloud Bus works by adding Spring Boot autconfiguration if it detects itself on the
 classpath. To enable the bus, add `spring-cloud-starter-bus-amqp` or
