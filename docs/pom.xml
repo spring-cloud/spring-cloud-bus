@@ -16,7 +16,7 @@
 	<properties>
 		<docs.main>spring-cloud-bus</docs.main>
 		<main.basedir>${basedir}/..</main.basedir>
-		<configprops.inclusionPattern>spring.cloud.*</configprops.inclusionPattern>
+		<configprops.inclusionPattern>spring.cloud.bus.*</configprops.inclusionPattern>
 		<!-- Don't upload docs jar to central / repo.spring.io -->
 		<maven-deploy-plugin-default.phase>none</maven-deploy-plugin-default.phase>
 	</properties>

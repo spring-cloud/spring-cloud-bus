@@ -1,6 +1,3 @@
 * xref:index.adoc[]
 * xref:spring-cloud-bus.adoc[]
-* xref:_attributes.adoc[]
-* xref:intro.adoc[]
-* xref:quickstart.adoc[]
 * xref:appendix.adoc[]
