@@ -1,6 +1,6 @@
 name: cloud-bus
 version: true
-title: spring-cloud-bus
+title: Spring Cloud Bus
 nav:
   - modules/ROOT/nav.adoc
 ext:
