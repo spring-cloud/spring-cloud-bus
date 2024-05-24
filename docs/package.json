@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "@antora/atlas-extension": "^1.0.0-alpha.1",
+    "@antora/cli": "^3.2.0-alpha.2",
+    "@antora/collector-extension": "^1.0.0-alpha.3",
+    "@antora/site-generator-default": "^3.2.0-alpha.2",
+    "@asciidoctor/tabs": "^1.0.0-beta.3",
+    "@springio/antora-extensions": "^1.6.0",
+    "@springio/asciidoctor-extensions": "^1.0.0-alpha.9",
+    "asciidoctor-kroki": "^0.17.0"
+  }
+}
