@@ -23,28 +23,31 @@
 	</issueManagement>
 
 	<properties>
-		<io.spring.maven.antora-version>0.0.3</io.spring.maven.antora-version>
+		<maven.antora-version>1.0.0-alpha.4</maven.antora-version>
+		<!-- Our Jenkins Servers are running Ubuntu 18.04 which uses glibc 2.27.  This version of glibc is only compatible with Node 16.x -->
+		<node.version>v16.20.2</node.version>
 	</properties>
 
 
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>io.spring.maven.antora</groupId>
+				<groupId>org.antora</groupId>
 				<artifactId>antora-maven-plugin</artifactId>
-				<version>${io.spring.maven.antora-version}</version>
+				<version>${maven.antora-version}</version>
 				<extensions>true</extensions>
 				<configuration>
+					<nodeVersion>${node.version}</nodeVersion>
 					<options>
 						<option>--to-dir=target/antora/site</option>
 						<option>--stacktrace</option>
 						<option>--fetch</option>
 					</options>
-					<environment>
+					<environmentVariables>
 						<ALGOLIA_API_KEY>9d489079e5ec46dbb238909fee5c9c29</ALGOLIA_API_KEY>
 						<ALGOLIA_APP_ID>WB1FQYI187</ALGOLIA_APP_ID>
 						<ALGOLIA_INDEX_NAME>springdocs</ALGOLIA_INDEX_NAME>
-					</environment>
+					</environmentVariables>
 					<packages>
 						<package>@antora/atlas-extension@1.0.0-alpha.1</package>
 						<package>@antora/collector-extension@1.0.0-alpha.3</package>
