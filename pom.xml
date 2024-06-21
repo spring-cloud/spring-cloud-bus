@@ -3,9 +3,13 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>org.springframework.cloud</groupId>
 	<artifactId>spring-cloud-bus-docs-build</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<parent>
+		<groupId>org.springframework.cloud</groupId>
+		<artifactId>spring-cloud-bus-parent</artifactId>
+		<version>4.1.2-SNAPSHOT</version>
+	</parent>
 
 	<name>Spring Cloud Bus Docs Build</name>
 	<description>Builds Spring Cloud Bus Docs.</description>
@@ -22,47 +26,14 @@
 		<url>https://github.com/spring-cloud/spring-cloud-bus/issues</url>
 	</issueManagement>
 
-	<properties>
-		<maven.antora-version>1.0.0-alpha.4</maven.antora-version>
-		<!-- Our Jenkins Servers are running Ubuntu 18.04 which uses glibc 2.27.  This version of glibc is only compatible with Node 16.x -->
-		<node.version>v16.20.2</node.version>
-	</properties>
-
 
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.antora</groupId>
 				<artifactId>antora-maven-plugin</artifactId>
-				<version>${maven.antora-version}</version>
-				<extensions>true</extensions>
-				<configuration>
-					<nodeVersion>${node.version}</nodeVersion>
-					<options>
-						<option>--to-dir=target/antora/site</option>
-						<option>--stacktrace</option>
-						<option>--fetch</option>
-					</options>
-				</configuration>
 			</plugin>
 		</plugins>
 	</build>
-
-	<repositories>
-		<repository>
-			<id>spring-snapshot</id>
-			<url>https://repo.spring.io/snapshot</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-		</repository>
-		<repository>
-			<id>spring-milestone</id>
-			<url>https://repo.spring.io/milestone</url>
-		</repository>
-	</repositories>
 
 </project>
