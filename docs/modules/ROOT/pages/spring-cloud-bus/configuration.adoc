@@ -21,6 +21,31 @@ Stream documentation.
 
 NOTE: If you have enabled https://docs.spring.io/spring-cloud-config/reference/client.html#config-first-bootstrap[config first bootstrap], you should place `spring.cloud.bus.destination` within your `bootstrap.[yaml | properties]` file or else if a refresh is triggered the value will be reset to the default.
 
+[[rabbitmq-exclusive-queues]]
+== RabbitMQ Exclusive Queues
+
+The AMQP binder declares an exclusive, auto-delete queue per application instance.
+With the default `spring.cloud.bus.destination`, those queues are named `springCloudBus.anonymous.*`.
+
+CAUTION: A RabbitMQ policy that sets `queue-master-locator` (classic mirrored queues on 3.x) or `queue-leader-locator` to `min-masters` on every queue can stop a restarted service from redeclaring its Bus queue. The app then fails to start until the old exclusive queue is gone. Keep Bus queues client-local, for example with a higher-priority policy:
+
+[source,json]
+----
+{
+  "vhost": "/",
+  "name": "spring_cloud_bus_client_local_queues",
+  "pattern": "^springCloudBus\\.anonymous\\..*",
+  "apply-to": "queues",
+  "definition": {
+    "queue-master-locator": "client-local"
+  },
+  "priority": 1
+}
+----
+
+If you changed `spring.cloud.bus.destination`, match that name instead of `springCloudBus`.
+Do not apply HA / mirroring policies to these exclusive queues.
+
 [[tracing-bus-events]]
 == Tracing Bus Events
 
