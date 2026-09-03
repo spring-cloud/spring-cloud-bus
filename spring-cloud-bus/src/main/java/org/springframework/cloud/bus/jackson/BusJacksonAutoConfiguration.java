@@ -21,9 +21,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.cfg.ConstructorDetector;
 import tools.jackson.databind.cfg.MapperBuilder;
 import tools.jackson.databind.exc.InvalidTypeIdException;
 import tools.jackson.databind.json.JsonMapper;
@@ -112,11 +114,17 @@ class BusJacksonMessageConverter extends AbstractMessageConverter implements Ini
 		super(mimeType);
 
 		if (objectMapper != null) {
-			this.mapperBuilder = objectMapper.rebuild();
+			this.mapperBuilder = objectMapper.rebuild()
+				.changeDefaultVisibility(visibility -> visibility.withCreatorVisibility(JsonAutoDetect.Visibility.NONE)
+					.withScalarConstructorVisibility(JsonAutoDetect.Visibility.NONE))
+				.constructorDetector(ConstructorDetector.EXPLICIT_ONLY);
 			this.mapperCreated = false;
 		}
 		else {
-			this.mapperBuilder = JsonMapper.builder();
+			this.mapperBuilder = JsonMapper.builder()
+				.changeDefaultVisibility(visibility -> visibility.withCreatorVisibility(JsonAutoDetect.Visibility.NONE)
+					.withScalarConstructorVisibility(JsonAutoDetect.Visibility.NONE))
+				.constructorDetector(ConstructorDetector.EXPLICIT_ONLY);
 			this.mapperCreated = true;
 		}
 	}
