@@ -18,6 +18,7 @@ package org.springframework.cloud.bus.jackson;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import org.junit.Test;
+import test.custom.TestEvent;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -80,6 +81,23 @@ public class SubtypeModuleTests {
 				MessageBuilder.withPayload("{\"type\":\"TestRemoteApplicationEvent\"}").build(),
 				RemoteApplicationEvent.class);
 		assertThat(event instanceof TestRemoteApplicationEvent).as("event is wrong type").isTrue();
+	}
+
+	@Test
+	public void testDeserializeCustomEventWithSimpleTypeName() throws Exception {
+		BusJacksonMessageConverter converter = new BusJacksonMessageConverter(null);
+		converter.setPackagesToScan(new String[] { "test.custom" });
+		converter.afterPropertiesSet();
+
+		Object event = converter.fromMessage(MessageBuilder
+			.withPayload("{\"type\":\"TestEvent\",\"originService\":\"publisher-service\",\"key\":\"test-key\","
+					+ "\"destinationService\":\"test-service:**\",\"id\":\"eeb09fa5-d833-460d-a132-abfec9079283\"}")
+			.build(), RemoteApplicationEvent.class);
+
+		assertThat(event).isInstanceOf(TestEvent.class);
+		assertThat(((TestEvent) event).getKey()).isEqualTo("test-key");
+		assertThat(((TestEvent) event).getOriginService()).isEqualTo("publisher-service");
+		assertThat(((TestEvent) event).getDestinationService()).isEqualTo("test-service:**");
 	}
 
 	@Test
