@@ -26,10 +26,14 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.bus.endpoint.EnvironmentBusEndpoint;
+import org.springframework.cloud.bus.endpoint.ServiceRegistryBusEndpoint;
 import org.springframework.cloud.bus.event.Destination;
 import org.springframework.cloud.bus.event.EnvironmentChangeListener;
 import org.springframework.cloud.bus.event.PathDestinationFactory;
+import org.springframework.cloud.bus.event.ServiceRegistryListener;
 import org.springframework.cloud.bus.event.TraceListener;
+import org.springframework.cloud.client.serviceregistry.Registration;
+import org.springframework.cloud.client.serviceregistry.ServiceRegistry;
 import org.springframework.cloud.context.environment.EnvironmentManager;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
@@ -57,6 +61,14 @@ public class BusAutoConfiguration {
 	public RemoteApplicationEventListener busRemoteApplicationEventListener(ServiceMatcher serviceMatcher,
 			BusBridge busBridge) {
 		return new RemoteApplicationEventListener(serviceMatcher, busBridge);
+	}
+
+	@Bean
+	@ConditionalOnBean({ ServiceRegistry.class, Registration.class })
+	@ConditionalOnMissingBean
+	public ServiceRegistryListener serviceRegistryListener(ServiceRegistry<Registration> serviceRegistry,
+			Registration registration, ServiceMatcher serviceMatcher) {
+		return new ServiceRegistryListener(serviceRegistry, registration, serviceMatcher);
 	}
 
 	@Bean
@@ -102,6 +114,19 @@ public class BusAutoConfiguration {
 				return new EnvironmentBusEndpoint(publisher, bus.getId(), destinationFactory);
 			}
 
+		}
+
+	}
+
+	@Configuration(proxyBeanMethods = false)
+	@ConditionalOnClass(Endpoint.class)
+	protected static class ServiceRegistryBusEndpointConfiguration {
+
+		@Bean
+		@ConditionalOnAvailableEndpoint
+		public ServiceRegistryBusEndpoint serviceRegistryBusEndpoint(ApplicationEventPublisher publisher,
+				BusProperties bus, Destination.Factory destinationFactory) {
+			return new ServiceRegistryBusEndpoint(publisher, bus.getId(), destinationFactory);
 		}
 
 	}
