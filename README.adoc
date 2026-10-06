@@ -10,8 +10,10 @@ Edit the files in the src/main/asciidoc/ directory instead.
 :page-section-summary-toc: 1
 
 
-[[quick-start]]
-== Quick Start
+[[repo-moved]]
+== Spring Cloud Bus has Moved
+The main branch has moved https://github.com/spring-cloud/spring-cloud-stream/tree/main/bus[here] in Spring Cloud Stream. The 5.0.x branch will be maintained until the end of https://spring.io/projects/spring-cloud-bus#support[July 2027] at which point this repository will be made read-only and archived.
+
 
 
 [[building]]
