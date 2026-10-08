@@ -26,6 +26,7 @@
 		<module>spring-cloud-starter-bus-amqp</module>
 		<module>spring-cloud-starter-bus-kafka</module>
 		<module>spring-cloud-starter-bus-stream</module>
+		<module>spring-cloud-starter-bus-jgroups</module>
 		<module>docs</module>
 	</modules>
 

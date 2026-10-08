@@ -32,6 +32,11 @@
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
+				<groupId>org.jgroups</groupId>
+				<artifactId>jgroups</artifactId>
+				<version>5.5.7.Final</version>
+			</dependency>
+			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-bus</artifactId>
 				<version>${project.version}</version>
