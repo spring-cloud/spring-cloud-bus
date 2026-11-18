@@ -17,7 +17,6 @@
 package org.springframework.cloud.bus;
 
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.actuate.web.exchanges.HttpExchangeRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -25,7 +24,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.cloud.bus.endpoint.EnvironmentBusEndpoint;
+import org.springframework.cloud.bus.endpoint.EnvironmentBusController;
 import org.springframework.cloud.bus.event.Destination;
 import org.springframework.cloud.bus.event.EnvironmentChangeListener;
 import org.springframework.cloud.bus.event.PathDestinationFactory;
@@ -96,10 +95,9 @@ public class BusAutoConfiguration {
 		protected static class EnvironmentBusEndpointConfiguration {
 
 			@Bean
-			@ConditionalOnAvailableEndpoint
-			public EnvironmentBusEndpoint environmentBusEndpoint(ApplicationEventPublisher publisher, BusProperties bus,
-					Destination.Factory destinationFactory) {
-				return new EnvironmentBusEndpoint(publisher, bus.getId(), destinationFactory);
+			public EnvironmentBusController environmentBusController(ApplicationEventPublisher publisher,
+					BusProperties bus, Destination.Factory destinationFactory) {
+				return new EnvironmentBusController(publisher, bus.getId(), destinationFactory);
 			}
 
 		}
