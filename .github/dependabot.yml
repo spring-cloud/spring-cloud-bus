@@ -5,9 +5,14 @@
 
 version: 2
 updates:
+  - package-ecosystem: npm
+    target-branch: docs-build
+    directory: /
+    schedule:
+      interval: weekly
   - package-ecosystem: "github-actions"
     directory: "/"
-    target-branch: "main"
+    target-branch: "5.0.x"
     schedule:
       interval: "weekly"
     exclude-paths:
@@ -17,7 +22,7 @@ updates:
     directory: /
     schedule:
       interval: daily
-    target-branch: main
+    target-branch: 5.0.x
     ignore:
       # only upgrade by minor or patch
       - dependency-name: "*"
@@ -25,12 +30,8 @@ updates:
           - version-update:semver-major
           - version-update:semver-minor
   - package-ecosystem: npm
-    target-branch: docs-build
-    directory: /
-    schedule:
-      interval: weekly
-  - package-ecosystem: npm
-    target-branch: main
+    target-branch: 5.0.x
     directory: /docs
     schedule:
       interval: weekly
+
