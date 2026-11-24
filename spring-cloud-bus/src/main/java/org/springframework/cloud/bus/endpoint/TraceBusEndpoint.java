@@ -29,7 +29,7 @@ import org.springframework.util.Assert;
  * {@link Endpoint @Endpoint} to expose {@link Trace} information.
  *
  * @author Ngoc Nhan
- * @since 5.0.4
+ * @since 5.0.5
  */
 @Endpoint(id = "bustrace")
 public class TraceBusEndpoint {

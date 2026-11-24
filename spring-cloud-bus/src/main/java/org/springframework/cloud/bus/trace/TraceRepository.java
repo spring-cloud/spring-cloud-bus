@@ -22,7 +22,7 @@ import java.util.List;
  * A repository for {@link Trace} instances.
  *
  * @author Ngoc Nhan
- * @since 5.0.4
+ * @since 5.0.5
  */
 public interface TraceRepository {
 

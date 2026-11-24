@@ -23,7 +23,7 @@ import java.util.List;
  * In-memory implementation of {@link TraceRepository}.
  *
  * @author Ngoc Nhan
- * @since 5.0.4
+ * @since 5.0.5
  */
 public class InMemoryTraceRepository implements TraceRepository {
 

@@ -28,7 +28,7 @@ import org.springframework.util.Assert;
  * {@link org.springframework.cloud.bus.endpoint.TraceBusEndpoint}, usually as JSON.
  *
  * @author Ngoc Nhan
- * @since 5.0.4
+ * @since 5.0.5
  */
 public final class Trace {
 
