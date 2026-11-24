@@ -123,11 +123,11 @@ class BusJacksonMessageConverter extends AbstractMessageConverter implements Ini
 			constructorDetector = ConstructorDetector.DEFAULT;
 			this.mapperCreated = true;
 		}
-		// Jackson 3 also considers constructors with matching parameter names when there is
-		// a default constructor. Remote events are bean style (see the default constructor
-		// of RemoteApplicationEvent), so a constructor taking the event source would be
-		// picked and called with a null source. Prefer the default constructor like
-		// Jackson 2 did (GH-3162).
+		// Jackson 3 also considers constructors with matching parameter names when
+		// there is a default constructor. Remote events are bean style (see the default
+		// constructor of RemoteApplicationEvent), so a constructor taking the event
+		// source would be picked and called with a null source. Prefer the default
+		// constructor like Jackson 2 did (GH-3162).
 		this.mapperBuilder.constructorDetector(constructorDetector.withAllowImplicitWithDefaultConstructor(false));
 	}
 

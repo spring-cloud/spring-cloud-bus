@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 package org.springframework.cloud.bus.jackson;
 
 import org.junit.Test;
@@ -26,8 +25,8 @@ import org.springframework.messaging.support.MessageBuilder;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Custom events that have a public no-arg constructor next to a public constructor
- * taking the source, as application code usually writes them (GH-3162).
+ * Custom events that have a public no-arg constructor next to a public constructor taking
+ * the source, as application code usually writes them (GH-3162).
  */
 public class CustomEventDeserializationTests {
 

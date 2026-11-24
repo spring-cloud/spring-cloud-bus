@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 package org.springframework.cloud.bus.jackson;
 
 import java.util.List;

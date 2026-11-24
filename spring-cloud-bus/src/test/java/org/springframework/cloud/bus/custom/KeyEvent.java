@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 package org.springframework.cloud.bus.custom;
 
 import org.springframework.cloud.bus.event.RemoteApplicationEvent;
